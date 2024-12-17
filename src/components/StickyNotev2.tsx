@@ -11,7 +11,6 @@ interface StickyNoteProps {
 }
 
 const StickyNoteV2: React.FC<StickyNoteProps> = ({ id, x, y, content }) => {
-  const [color, setColor] = useState<StickyNoteColor>(STICKY_COLORS[0]);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [deletionArmed, setDeletionArmed] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
@@ -26,7 +25,12 @@ const StickyNoteV2: React.FC<StickyNoteProps> = ({ id, x, y, content }) => {
     cancelConnection,
     endConnection,
     updateNotePosition,
+    settings,
   } = useBoardStore();
+
+  const [color, setColor] = useState<StickyNoteColor>(
+    settings.defaultStickyColor
+  );
 
   // Update position when props change
   useEffect(() => {
