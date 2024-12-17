@@ -54,7 +54,8 @@ const useBoardStore = create<BoardState>((set) => ({
   activeConnection: null,
 
   // Note Actions
-  addNote: (x, y) =>
+  addNote: (x, y) => {
+    console.debug(`Adding note at ${x}, ${y}`);
     set((state) => ({
       notes: [
         ...state.notes,
@@ -65,7 +66,8 @@ const useBoardStore = create<BoardState>((set) => ({
           content: "",
         },
       ],
-    })),
+    }));
+  },
 
   updateNotePosition: (id, x, y) =>
     set((state) => ({
@@ -90,12 +92,14 @@ const useBoardStore = create<BoardState>((set) => ({
     })),
 
   // Connection Actions
-  startConnection: (fromId, fromSide) =>
+  startConnection: (fromId, fromSide) => {
+    console.debug(`Begin ${fromSide} connection from ${fromId}`);
     set({
       activeConnection: { fromId, fromSide },
-    }),
+    });
+  },
 
-  endConnection: (toId, toSide) =>
+  endConnection: (toId, toSide) => {
     set((state) => {
       if (!state.activeConnection || state.activeConnection.fromId === toId) {
         return {};
@@ -113,6 +117,9 @@ const useBoardStore = create<BoardState>((set) => ({
         return { activeConnection: null };
       }
 
+      console.debug(
+        `Finalizing ${state.activeConnection.fromSide} -> ${toSide} connection between ${state.activeConnection.fromId} to ${toId}`
+      );
       return {
         connections: [
           ...state.connections,
@@ -126,7 +133,8 @@ const useBoardStore = create<BoardState>((set) => ({
         ],
         activeConnection: null,
       };
-    }),
+    });
+  },
 
   cancelConnection: () =>
     set({
