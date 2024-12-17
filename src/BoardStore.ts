@@ -11,12 +11,25 @@ interface Note {
   content: string;
 }
 
+export type ConnectionStyle = {
+  isCurved: boolean;
+  isDirectional: boolean;
+  type: "dependency" | "informs";
+};
+
+const DEFAULT_CONNECTION_STYLE: ConnectionStyle = {
+  isCurved: true,
+  isDirectional: false,
+  type: "informs",
+};
+
 interface Connection {
   id: number;
   fromId: number;
   fromSide: Side;
   toId: number;
   toSide: Side;
+  style: ConnectionStyle;
 }
 
 interface ActiveConnection {
@@ -53,6 +66,7 @@ interface BoardState {
   endConnection: (toId: number, toSide: Side) => void;
   cancelConnection: () => void;
   deleteConnection: (connectionId: number) => void;
+  updateConnection: (id: number, updates: Partial<Connection>) => void;
 
   // Settings actions
   changeSettings: (newSettings: BoardSettings) => void;
@@ -140,6 +154,7 @@ const useBoardStore = create<BoardState>((set) => ({
             fromSide: state.activeConnection.fromSide,
             toId,
             toSide,
+            style: DEFAULT_CONNECTION_STYLE,
           },
         ],
         activeConnection: null,
@@ -155,6 +170,20 @@ const useBoardStore = create<BoardState>((set) => ({
   deleteConnection: (connectionId) =>
     set((state) => ({
       connections: state.connections.filter((conn) => conn.id !== connectionId),
+    })),
+  updateConnection: (id, updates) =>
+    set((state) => ({
+      connections: state.connections.map((conn) =>
+        conn.id === id
+          ? {
+              ...conn,
+              ...updates,
+              style: updates.style
+                ? { ...conn.style, ...updates.style }
+                : conn.style,
+            }
+          : conn
+      ),
     })),
 
   changeSettings: (newSettings) => {

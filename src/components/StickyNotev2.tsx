@@ -109,10 +109,10 @@ const StickyNoteV2: React.FC<StickyNoteProps> = ({ id, x, y, content }) => {
     <div
       className={`absolute ${
         color.bgClass
-      } w-48 h-48 p-4 shadow-lg rounded-sm font-lato
-        ${deletionArmed ? "ring-2 ring-red-500" : ""}
-        ${activeConnection?.fromId == id ? "ring-2 ring-blue-500" : ""}
-        ${isDragging ? "cursor-grabbing" : ""}`}
+      } w-48 h-48 p-4 shadow-lg rounded-sm font-lato flex flex-col
+      ${deletionArmed ? "ring-2 ring-red-500" : ""}
+      ${activeConnection?.fromId == id ? "ring-2 ring-blue-500" : ""}
+      ${isDragging ? "cursor-grabbing" : ""}`}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       style={{
@@ -206,9 +206,15 @@ const StickyNoteV2: React.FC<StickyNoteProps> = ({ id, x, y, content }) => {
         )}
       </div>
       <textarea
-        className="w-full h-full bg-transparent resize-none border-none focus:outline-none font-lato text-black"
-        defaultValue={content}
-        placeholder="Enter your note..."
+        className="w-full bg-transparent resize-none border-none focus:outline-none font-lato text-black font-bold text-lg mb-2 h-8"
+        defaultValue={content.split("\n")[0] || ""}
+        placeholder="Title..."
+        onClick={(e) => e.stopPropagation()}
+      />
+      <textarea
+        className="w-full flex-1 bg-transparent resize-none border-none focus:outline-none font-lato text-black text-sm"
+        defaultValue={content.split("\n").slice(1).join("\n")}
+        placeholder="Description..."
         onClick={(e) => e.stopPropagation()}
       />
     </div>
