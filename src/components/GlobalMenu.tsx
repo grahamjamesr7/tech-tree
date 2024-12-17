@@ -23,7 +23,7 @@ const GlobalMenu: React.FC<GlobalMenuProps> = ({ setSettingsOpen }) => {
     >
       <SpeedDialAction
         icon={<Trash2 size={20} />}
-        tooltipTitle={armed ? "Are your sure?" : "Clear Board"}
+        tooltipTitle={armed ? "Are you sure?" : "Clear Board"}
         onClick={(e) => {
           e.preventDefault();
           e.stopPropagation();
@@ -32,12 +32,27 @@ const GlobalMenu: React.FC<GlobalMenuProps> = ({ setSettingsOpen }) => {
             setArmed(false);
           } else {
             setArmed(true);
+            setTimeout(() => {
+              setArmed(false);
+            }, 3500);
           }
         }}
         tooltipOpen
         tooltipPlacement="right"
+        sx={{
+          "& .MuiSpeedDialAction-staticTooltipLabel": {
+            minWidth: "120px",
+            textAlign: "center",
+          },
+        }}
         FabProps={{
-          color: armed ? "error" : "inherit",
+          sx: {
+            bgcolor: armed ? "error.main" : "background.paper",
+            color: armed ? "white" : "black",
+            "&:hover": {
+              bgcolor: armed ? "error.dark" : "background.default",
+            },
+          },
         }}
       />
       <SpeedDialAction

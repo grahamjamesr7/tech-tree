@@ -13,6 +13,11 @@ const SpatialBoardV2: React.FC = () => {
     useBoardStore();
 
   const handleCanvasClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (activeConnection) {
+      useBoardStore.getState().cancelConnection();
+      return;
+    }
+
     const rect = e.currentTarget.getBoundingClientRect();
     let x = (e.clientX - rect.left) / zoom;
     let y = (e.clientY - rect.top) / zoom;
