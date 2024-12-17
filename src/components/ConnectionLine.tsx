@@ -8,8 +8,8 @@ interface ConnectionLineProps {
 
 /**
  * TODOs:
- * 1. add radial menu to center of line (should be linear along line)
- * 2. move delete into radial menu
+ * 1. add "radial" menu to center of line (should be linear along line, styled like a pill)
+ * 2. move delete into "radial" menu
  * 3. allow to change dotted/solid
  * 4. allow to change curve/straight line
  */

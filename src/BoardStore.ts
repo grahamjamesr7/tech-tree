@@ -1,5 +1,6 @@
 // src/store/boardStore.ts
 import { create } from "zustand";
+import { STICKY_COLORS, StickyNoteColor } from "./constants";
 
 type Side = "top" | "right" | "bottom" | "left";
 
@@ -23,12 +24,23 @@ interface ActiveConnection {
   fromSide: Side;
 }
 
+interface BoardSettings {
+  confirmDeletes: boolean;
+  defaultStickyColor: StickyNoteColor;
+}
+
+const DEFAULT_SETTINGS: BoardSettings = {
+  confirmDeletes: true,
+  defaultStickyColor: STICKY_COLORS[0],
+};
+
 interface BoardState {
   // State
   notes: Note[];
   connections: Connection[];
   zoom: number;
   activeConnection: ActiveConnection | null;
+  settings: BoardSettings;
 
   // Note Actions
   addNote: (x: number, y: number) => void;
@@ -42,8 +54,12 @@ interface BoardState {
   cancelConnection: () => void;
   deleteConnection: (connectionId: number) => void;
 
+  // Settings actions
+  changeSettings: (newSettings: BoardSettings) => void;
+
   // View Actions
   setZoom: (zoom: number) => void;
+  clearBoard: () => void;
 }
 
 const useBoardStore = create<BoardState>((set) => ({
@@ -52,10 +68,10 @@ const useBoardStore = create<BoardState>((set) => ({
   connections: [],
   zoom: 1,
   activeConnection: null,
+  settings: DEFAULT_SETTINGS,
 
   // Note Actions
   addNote: (x, y) => {
-    console.debug(`Adding note at ${x}, ${y}`);
     set((state) => ({
       notes: [
         ...state.notes,
@@ -93,7 +109,6 @@ const useBoardStore = create<BoardState>((set) => ({
 
   // Connection Actions
   startConnection: (fromId, fromSide) => {
-    console.debug(`Begin ${fromSide} connection from ${fromId}`);
     set({
       activeConnection: { fromId, fromSide },
     });
@@ -116,10 +131,6 @@ const useBoardStore = create<BoardState>((set) => ({
       if (connectionExists) {
         return { activeConnection: null };
       }
-
-      console.debug(
-        `Finalizing ${state.activeConnection.fromSide} -> ${toSide} connection between ${state.activeConnection.fromId} to ${toId}`
-      );
       return {
         connections: [
           ...state.connections,
@@ -146,8 +157,19 @@ const useBoardStore = create<BoardState>((set) => ({
       connections: state.connections.filter((conn) => conn.id !== connectionId),
     })),
 
+  changeSettings: (newSettings) => {
+    set((state) => ({
+      settings: { ...state.settings, ...newSettings },
+    }));
+  },
   // View Actions
   setZoom: (zoom) => set({ zoom }),
+  clearBoard: () =>
+    set(() => ({
+      notes: [],
+      connections: [],
+      activeConnection: null,
+    })),
 }));
 
 // Helper function to get connection point coordinates
