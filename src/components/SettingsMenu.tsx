@@ -5,12 +5,23 @@ import { STICKY_COLORS } from "../constants";
 import {
   Paper,
   Typography,
+  FormGroup,
   FormControlLabel,
   Checkbox,
   IconButton,
   Box,
+  Divider,
+  Tooltip,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  useTheme,
+  alpha,
 } from "@mui/material";
-import { X } from "lucide-react";
+import CloseIcon from "@mui/icons-material/Close";
+import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
+import GridOnIcon from "@mui/icons-material/GridOn";
+import PaletteIcon from "@mui/icons-material/Palette";
 
 interface SettingsMenuProps {
   isOpen: boolean;
@@ -18,19 +29,17 @@ interface SettingsMenuProps {
 }
 
 const SettingsMenu: React.FC<SettingsMenuProps> = ({ isOpen, onClose }) => {
+  const theme = useTheme();
   const { settings, changeSettings } = useBoardStore();
   const [localSettings, setLocalSettings] = useState(settings);
 
-  // Sync local settings with board settings when opened
   useEffect(() => {
     if (isOpen) {
       setLocalSettings(settings);
     }
   }, [isOpen, settings]);
 
-  // Update local settings and sync with board
   const updateSettings = (updates: Partial<typeof settings>) => {
-    console.debug({ updates });
     const newSettings = {
       ...localSettings,
       ...updates,
@@ -49,32 +58,50 @@ const SettingsMenu: React.FC<SettingsMenuProps> = ({ isOpen, onClose }) => {
   if (!isOpen) return null;
 
   return ReactDOM.createPortal(
-    <Box
-      sx={{
-        position: "absolute",
-        top: "60px",
-        right: "20px",
-        zIndex: 1000,
+    <Dialog
+      open={isOpen}
+      onClose={onClose}
+      PaperProps={{
+        sx: {
+          minWidth: 360,
+          maxWidth: "90vw",
+          m: 0,
+        },
       }}
-      onClick={(e) => {
-        e.stopPropagation();
-      }}
+      onClick={(e) => e.stopPropagation()}
     >
-      <Paper elevation={3} sx={{ p: 2, width: 300 }}>
-        <div className="space-y-4">
-          <Box
-            sx={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              mb: 2,
-            }}
-          >
-            <Typography variant="h6">Settings</Typography>
-            <IconButton onClick={onClose} size="small">
-              <X />
-            </IconButton>
-          </Box>
+      <DialogTitle
+        sx={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          pb: 1,
+        }}
+      >
+        <Box>
+          <Typography variant="h6" component="div">
+            Settings
+          </Typography>
+          <Typography variant="caption" color="text.secondary">
+            Changes saved automatically
+          </Typography>
+        </Box>
+        <IconButton
+          onClick={onClose}
+          size="small"
+          sx={{
+            color: theme.palette.text.secondary,
+            "&:hover": {
+              backgroundColor: alpha(theme.palette.text.secondary, 0.1),
+            },
+          }}
+        >
+          <CloseIcon fontSize="small" />
+        </IconButton>
+      </DialogTitle>
+      <Divider />
+      <DialogContent sx={{ pt: 2 }}>
+        <FormGroup sx={{ mb: 3 }}>
           <FormControlLabel
             control={
               <Checkbox
@@ -85,51 +112,89 @@ const SettingsMenu: React.FC<SettingsMenuProps> = ({ isOpen, onClose }) => {
                 color="primary"
               />
             }
-            label="Confirm before deleting notes"
+            label={
+              <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                <DeleteOutlineIcon
+                  sx={{ color: theme.palette.text.secondary }}
+                  fontSize="small"
+                />
+                <Typography variant="body2">
+                  Confirm before deleting notes
+                </Typography>
+              </Box>
+            }
           />
           <FormControlLabel
             control={
               <Checkbox
                 checked={localSettings.showGrid}
-                onChange={(e) =>
-                  updateSettings({
-                    showGrid: e.target.checked,
-                  })
-                }
+                onChange={(e) => updateSettings({ showGrid: e.target.checked })}
                 color="primary"
               />
             }
-            label="Show gridlines"
+            label={
+              <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                <GridOnIcon
+                  sx={{ color: theme.palette.text.secondary }}
+                  fontSize="small"
+                />
+                <Typography variant="body2">Show gridlines</Typography>
+              </Box>
+            }
           />
-          <Box>
-            <Typography variant="subtitle2" sx={{ mb: 1 }}>
+        </FormGroup>
+
+        <Box sx={{ mb: 2 }}>
+          <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 1.5 }}>
+            <PaletteIcon
+              sx={{ color: theme.palette.text.secondary }}
+              fontSize="small"
+            />
+            <Typography
+              variant="subtitle2"
+              sx={{
+                color: theme.palette.text.secondary,
+                fontWeight: 500,
+              }}
+            >
               Default Note Color
             </Typography>
-            <Box sx={{ display: "flex", gap: 1 }}>
-              {STICKY_COLORS.map((color) => (
+          </Box>
+          <Box
+            sx={{
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fill, minmax(40px, 1fr))",
+              gap: 1,
+            }}
+          >
+            {STICKY_COLORS.map((color) => (
+              <Tooltip key={color.name} title={color.name}>
                 <IconButton
-                  key={color.name}
                   onClick={() => handleColorChange(color.name)}
                   sx={{
-                    width: 32,
-                    height: 32,
+                    width: 40,
+                    height: 40,
                     backgroundColor: color.rawColor,
                     border:
                       localSettings.defaultStickyColor.name === color.name
-                        ? "2px solid #555"
-                        : "none",
+                        ? `2px solid ${theme.palette.primary.main}`
+                        : "2px solid transparent",
                     "&:hover": {
-                      border: "2px solid #888",
+                      backgroundColor: alpha(color.rawColor, 0.8),
+                      border: `2px solid ${theme.palette.primary.light}`,
                     },
+                    transition: theme.transitions.create([
+                      "border-color",
+                      "background-color",
+                    ]),
                   }}
-                  title={color.name}
                 />
-              ))}
-            </Box>
+              </Tooltip>
+            ))}
           </Box>
-        </div>
-      </Paper>
-    </Box>,
+        </Box>
+      </DialogContent>
+    </Dialog>,
     document.body
   );
 };
