@@ -154,7 +154,6 @@ const ConnectionLine: React.FC<ConnectionLineProps> = ({ id }) => {
           markerHeight="4"
           refX="3"
           refY="2"
-          // orient="auto-start-reverse"
           orient={getIncomingArrowRotation(connection.toSide)}
           markerUnits="strokeWidth"
         >

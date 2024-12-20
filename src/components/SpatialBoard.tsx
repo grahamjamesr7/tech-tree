@@ -4,6 +4,7 @@ import ConnectionLine from "./ConnectionLine";
 import StickyNoteV2 from "./StickyNotev2";
 import SettingsMenu from "./SettingsMenu";
 import GlobalMenu from "./GlobalMenu";
+import GlobalTimeline from "./GlobalTimeline";
 
 const SpatialBoardV2: React.FC = () => {
   const [globalMenuOpen, setGlobalMenuOpen] = useState(false);
@@ -78,6 +79,9 @@ const SpatialBoardV2: React.FC = () => {
         isOpen={settingsOpen}
         onClose={() => setSettingsOpen(false)}
       />
+
+      <GlobalTimeline />
+
       <div
         className="absolute inset-0 bg-grid-pattern opacity-10"
         style={{
