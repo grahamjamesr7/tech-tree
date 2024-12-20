@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { SpeedDial, SpeedDialAction } from "@mui/material";
-import { Ellipsis, Settings2, Trash2 } from "lucide-react";
+import { Ellipsis, Save, Settings2, Trash2, Check } from "lucide-react";
 import useBoardStore from "../BoardStore";
 
 interface GlobalMenuProps {
@@ -9,7 +9,15 @@ interface GlobalMenuProps {
 
 const GlobalMenu: React.FC<GlobalMenuProps> = ({ setSettingsOpen }) => {
   const [armed, setArmed] = useState(false);
-  const { clearBoard } = useBoardStore();
+  const { clearBoard, saveBoard } = useBoardStore();
+  const [saveSuccess, setSaveSuccess] = useState(false);
+
+  const handleSave = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    saveBoard();
+    setSaveSuccess(true);
+    setTimeout(() => setSaveSuccess(false), 1500);
+  };
   return (
     <SpeedDial
       ariaLabel="Board actions"
@@ -51,6 +59,22 @@ const GlobalMenu: React.FC<GlobalMenuProps> = ({ setSettingsOpen }) => {
             color: armed ? "white" : "black",
             "&:hover": {
               bgcolor: armed ? "error.dark" : "background.default",
+            },
+          },
+        }}
+      />
+      <SpeedDialAction
+        icon={saveSuccess ? <Check size={20} /> : <Save size={20} />}
+        tooltipTitle="Save Board"
+        onClick={handleSave}
+        tooltipOpen
+        tooltipPlacement="right"
+        sx={{
+          "& .MuiButtonBase-root": {
+            bgcolor: saveSuccess ? "success.main" : "background.paper",
+            color: saveSuccess ? "white" : "black",
+            "&:hover": {
+              bgcolor: saveSuccess ? "success.dark" : "background.default",
             },
           },
         }}

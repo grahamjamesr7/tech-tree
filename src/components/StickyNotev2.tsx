@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback } from "react";
-import useBoardStore, { Side } from "../BoardStore";
+import useBoardStore, { Note, Side } from "../BoardStore";
 import { Move, Trash2 } from "lucide-react";
 import { STICKY_COLORS, StickyNoteColor } from "../constants";
 
@@ -7,35 +7,53 @@ interface StickyNoteProps {
   id: number;
   x: number;
   y: number;
-  content: string;
 }
 
-const StickyNoteV2: React.FC<StickyNoteProps> = ({ id, x, y, content }) => {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [deletionArmed, setDeletionArmed] = useState(false);
-  const [isHovered, setIsHovered] = useState(false);
-  const [isDragging, setIsDragging] = useState(false);
-  const [offset, setOffset] = useState({ x: 0, y: 0 });
-  const [position, setPosition] = useState({ x, y });
-
+const StickyNoteV2: React.FC<StickyNoteProps> = ({ id, x, y }) => {
   const {
     deleteNote,
     startConnection,
     activeConnection,
     cancelConnection,
     endConnection,
-    updateNotePosition,
+    updateNote,
     settings,
+    notes,
   } = useBoardStore();
+
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [deletionArmed, setDeletionArmed] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
+  const [offset, setOffset] = useState({ x: 0, y: 0 });
+
+  const thisNote = notes.find((i) => i.id == id);
+  if (!thisNote) {
+    return (
+      <div className="flex flex-col items-center justify-center">
+        <svg className="w-6 h-6 text-red-500" viewBox="0 0 24 24">
+          <path
+            fill="currentColor"
+            d="M12 2L1 21h22M12 6l7.53 13H4.47M11 10v4h2v-4m-2 6v2h2v-2"
+          />
+        </svg>
+        <div className="text-red-500 mt-2">Note not found</div>
+      </div>
+    );
+  }
+
+  const [localNote, setLocalNote] = useState<Note>({
+    title: thisNote.title || "",
+    content: thisNote.content || "",
+    id: id,
+    x: x,
+    y: y,
+    recursive: false,
+  });
 
   const [color, setColor] = useState<StickyNoteColor>(
     settings.defaultStickyColor
   );
-
-  // Update position when props change
-  useEffect(() => {
-    setPosition({ x, y });
-  }, [x, y]);
 
   const handleMouseDown = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -57,8 +75,9 @@ const StickyNoteV2: React.FC<StickyNoteProps> = ({ id, x, y, content }) => {
       const newX = e.clientX - 2 * offset.x + 96;
       const newY = e.clientY + 2 * offset.y + 96;
 
-      setPosition({ x: newX, y: newY });
-      updateNotePosition(id, newX, newY);
+      const updatedNote = { ...localNote, x: newX, y: newY };
+      setLocalNote(updatedNote);
+      updateNote(updatedNote); // short circuit, we need the connection to move with the sticky
     };
 
     const handleMouseUp = (e: MouseEvent) => {
@@ -84,7 +103,7 @@ const StickyNoteV2: React.FC<StickyNoteProps> = ({ id, x, y, content }) => {
       window.removeEventListener("mousemove", handleMouseMove);
       window.removeEventListener("mouseup", handleMouseUp);
     };
-  }, [isDragging, offset, id, updateNotePosition]);
+  }, [isDragging, offset, id, updateNote]);
 
   function handleDelete() {
     if (!deletionArmed) {
@@ -105,6 +124,19 @@ const StickyNoteV2: React.FC<StickyNoteProps> = ({ id, x, y, content }) => {
     }
   }
 
+  useEffect(() => {
+    const debounceTimeout = setTimeout(() => {
+      // Deep equality check between localNote and thisNote
+      const hasChanged = JSON.stringify(localNote) !== JSON.stringify(thisNote);
+
+      if (hasChanged) {
+        updateNote(localNote);
+      }
+    }, 1000);
+
+    return () => clearTimeout(debounceTimeout);
+  }, [localNote, id, thisNote]);
+
   return (
     <div
       className={`absolute ${
@@ -116,8 +148,8 @@ const StickyNoteV2: React.FC<StickyNoteProps> = ({ id, x, y, content }) => {
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       style={{
-        left: position.x,
-        top: position.y,
+        left: localNote.x,
+        top: localNote.y,
         transform: "translate(-50%, -50%)",
         zIndex: isDragging ? 1000 : 1,
         cursor: isDragging ? "grabbing" : "auto",
@@ -207,15 +239,23 @@ const StickyNoteV2: React.FC<StickyNoteProps> = ({ id, x, y, content }) => {
       </div>
       <textarea
         className="w-full bg-transparent resize-none border-none focus:outline-none font-lato text-black font-bold text-lg mb-2 h-8"
-        defaultValue={content.split("\n")[0] || ""}
         placeholder="Title..."
         onClick={(e) => e.stopPropagation()}
+        value={localNote.title}
+        onChange={(e) => {
+          const updatedNote = { ...localNote, title: e.target.value };
+          setLocalNote(updatedNote);
+        }}
       />
       <textarea
         className="w-full flex-1 bg-transparent resize-none border-none focus:outline-none font-lato text-black text-sm"
-        defaultValue={content.split("\n").slice(1).join("\n")}
         placeholder="Description..."
         onClick={(e) => e.stopPropagation()}
+        value={localNote.content}
+        onChange={(e) => {
+          const updatedNote = { ...localNote, content: e.target.value };
+          setLocalNote(updatedNote);
+        }}
       />
     </div>
   );

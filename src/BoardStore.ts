@@ -4,11 +4,24 @@ import { STICKY_COLORS, StickyNoteColor } from "./constants";
 
 type Side = "top" | "right" | "bottom" | "left";
 
+type StickySize =
+  | "trivial"
+  | "extra-small"
+  | "small"
+  | "medium"
+  | "large"
+  | "extra-large"
+  | "too-big";
+
 interface Note {
   id: number;
   x: number;
   y: number;
+  title: string;
   content: string;
+  size?: StickySize;
+  status?: "not-started" | "in-progress" | "done" | "blocked";
+  recursive: boolean;
 }
 
 export type ConnectionStyle = {
@@ -57,8 +70,7 @@ interface BoardState {
 
   // Note Actions
   addNote: (x: number, y: number) => void;
-  updateNotePosition: (id: number, x: number, y: number) => void;
-  updateNoteContent: (id: number, content: string) => void;
+  updateNote: (newNote: Note) => void;
   deleteNote: (id: number) => void;
 
   // Connection Actions
@@ -74,15 +86,25 @@ interface BoardState {
   // View Actions
   setZoom: (zoom: number) => void;
   clearBoard: () => void;
+
+  // Persistence Actions
+  saveBoard: () => void;
+  loadBoard: () => void;
 }
 
-const useBoardStore = create<BoardState>((set) => ({
+const savedState = localStorage.getItem("boardState");
+
+const initState: BoardState = savedState ? JSON.parse(savedState) : undefined;
+
+const useBoardStore = create<BoardState>((set, get) => ({
   // Initial State
-  notes: [],
-  connections: [],
+  notes: initState ? initState.notes || [] : [],
+  connections: initState ? initState.connections || [] : [],
   zoom: 1,
   activeConnection: null,
-  settings: DEFAULT_SETTINGS,
+  settings: initState
+    ? initState.settings || DEFAULT_SETTINGS
+    : DEFAULT_SETTINGS,
 
   // Note Actions
   addNote: (x, y) => {
@@ -93,23 +115,18 @@ const useBoardStore = create<BoardState>((set) => ({
           id: Date.now(),
           x,
           y,
+          title: "",
           content: "",
+          recursive: false,
         },
       ],
     }));
   },
 
-  updateNotePosition: (id, x, y) =>
+  updateNote: (newNote) =>
     set((state) => ({
       notes: state.notes.map((note) =>
-        note.id === id ? { ...note, x, y } : note
-      ),
-    })),
-
-  updateNoteContent: (id, content) =>
-    set((state) => ({
-      notes: state.notes.map((note) =>
-        note.id === id ? { ...note, content } : note
+        note.id === newNote.id ? { ...note, ...newNote } : note
       ),
     })),
 
@@ -193,12 +210,45 @@ const useBoardStore = create<BoardState>((set) => ({
   },
   // View Actions
   setZoom: (zoom) => set({ zoom }),
-  clearBoard: () =>
+  clearBoard: () => {
+    localStorage.removeItem("boardState");
     set(() => ({
       notes: [],
       connections: [],
       activeConnection: null,
-    })),
+    }));
+  },
+
+  // Persistence Actions
+  saveBoard: () => {
+    const state = get();
+    const saveData = {
+      id: Date.now(),
+      notes: state.notes,
+      connections: state.connections,
+      settings: state.settings,
+    };
+    try {
+      localStorage.setItem("boardState", JSON.stringify(saveData));
+    } catch (err) {
+      console.error("Failed to save board state:", err);
+    }
+  },
+  loadBoard: () => {
+    try {
+      const savedState = localStorage.getItem("boardState");
+      if (savedState) {
+        const { notes, connections, settings } = JSON.parse(savedState);
+        set({
+          notes: notes || [],
+          connections: connections || [],
+          settings: settings || DEFAULT_SETTINGS,
+        });
+      }
+    } catch (err) {
+      console.error("Failed to load board state:", err);
+    }
+  },
 }));
 
 // Helper function to get connection point coordinates
@@ -218,5 +268,5 @@ export const getConnectionPoint = (
   }
 };
 
-export type { Note, Connection, Side, ActiveConnection };
+export type { Note, Connection, Side, ActiveConnection, StickySize };
 export default useBoardStore;
