@@ -18,6 +18,23 @@ interface RadialMenuProps {
   close: () => void;
 }
 
+function getIncomingArrowRotation(
+  side: "top" | "right" | "bottom" | "left"
+): number {
+  switch (side) {
+    case "top":
+      return 90; // Point upward
+    default:
+      return 0;
+    case "right":
+      return 180; // Point rightward
+    case "bottom":
+      return 270; // Point downward
+    case "left":
+      return 0; // Point leftward
+  }
+}
+
 export const RadialMenu: React.FC<RadialMenuProps> = ({
   x,
   y,
@@ -70,12 +87,6 @@ export const RadialMenu: React.FC<RadialMenuProps> = ({
           )}
         </svg>
       </button>
-      <button
-        className="p-1 hover:bg-gray-100 rounded-full"
-        onClick={() => onStyleChange({ isDirectional: !style.isDirectional })}
-      >
-        <ArrowRight size={16} />
-      </button>
       <button className="p-1 hover:bg-gray-100 rounded-full" onClick={onDelete}>
         <Trash2 size={16} className="text-red-500" />
       </button>
@@ -105,13 +116,22 @@ const ConnectionLine: React.FC<ConnectionLineProps> = ({ id }) => {
   const start = getConnectionPoint(fromNote, connection.fromSide);
   const end = getConnectionPoint(toNote, connection.toSide);
 
-  // Calculate control points for curved path
+  // Calculate midpoints for the Bezier curve
   const midX = (start.x + end.x) / 2;
   const midY = (start.y + end.y) / 2;
-  const controlPoint1X = connection.style.isCurved ? midX : start.x;
-  const controlPoint1Y = connection.style.isCurved ? start.y : start.y;
-  const controlPoint2X = connection.style.isCurved ? midX : end.x;
-  const controlPoint2Y = connection.style.isCurved ? end.y : end.y;
+
+  // Calculate the path with control points based on the connection sides
+  let controlPoint1X = midX;
+  let controlPoint1Y = start.y;
+  let controlPoint2X = midX;
+  let controlPoint2Y = end.y;
+
+  if (!connection.style.isCurved) {
+    controlPoint1X = start.x;
+    controlPoint1Y = start.y;
+    controlPoint2X = end.x;
+    controlPoint2Y = end.y;
+  }
 
   // Create the path for the connection line
   const path = `M ${start.x} ${start.y} C ${controlPoint1X} ${controlPoint1Y}, ${controlPoint2X} ${controlPoint2Y}, ${end.x} ${end.y}`;
@@ -126,6 +146,22 @@ const ConnectionLine: React.FC<ConnectionLineProps> = ({ id }) => {
       className="absolute top-0 left-0 w-full h-full"
       style={{ overflow: "visible" }}
     >
+      {/* Define the arrowhead marker */}
+      <defs>
+        <marker
+          id="arrowhead"
+          markerWidth="6"
+          markerHeight="4"
+          refX="3"
+          refY="2"
+          // orient="auto-start-reverse"
+          orient={getIncomingArrowRotation(connection.toSide)}
+          markerUnits="strokeWidth"
+        >
+          <polygon points="0 0, 5 2, 0 4" fill="black" stroke="none" />
+        </marker>
+      </defs>
+
       {/* Invisible wider path for better click target */}
       <path
         d={path}
@@ -143,39 +179,26 @@ const ConnectionLine: React.FC<ConnectionLineProps> = ({ id }) => {
       <path
         d={path}
         stroke="black"
-        strokeWidth={connection.style.type == "informs" ? 2 : 6}
-        strokeDasharray={connection.style.type == "informs" ? "5,5" : "none"}
+        strokeWidth={connection.style.type === "informs" ? 4 : 6}
+        strokeDasharray={connection.style.type === "informs" ? "5,5" : "none"}
         fill="none"
         pointerEvents="none"
+        markerEnd="url(#arrowhead)"
       />
-
-      {/* Arrow marker if directional */}
-      {connection.style.isDirectional && (
-        <marker
-          id={`arrowhead-${id}`}
-          markerWidth="10"
-          markerHeight="7"
-          refX="9"
-          refY="3.5"
-          orient="auto"
-        >
-          <polygon points="0 0, 10 3.5, 0 7" fill="black" />
-        </marker>
-      )}
 
       {/* Radial menu */}
       {isMenuOpen && (
         <foreignObject
-          x={midX - 100} // Offset to ensure menu is centered
-          y={midY - 20} // Offset for vertical centering
-          width="200" // Fixed width to contain the menu
-          height="40" // Fixed height to contain the menu
+          x={midX - 100}
+          y={midY - 20}
+          width="200"
+          height="40"
           style={{ overflow: "visible" }}
         >
           <div className="relative w-full h-full">
             <RadialMenu
-              x={100} // Center point of the foreignObject
-              y={20} // Center point of the foreignObject
+              x={100}
+              y={20}
               style={connection.style}
               onStyleChange={handleStyleChange}
               onDelete={() => deleteConnection(id)}

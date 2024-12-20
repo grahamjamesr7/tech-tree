@@ -27,13 +27,11 @@ interface Note {
 
 export type ConnectionStyle = {
   isCurved: boolean;
-  isDirectional: boolean;
   type: "dependency" | "informs";
 };
 
 const DEFAULT_CONNECTION_STYLE: ConnectionStyle = {
   isCurved: true,
-  isDirectional: false,
   type: "informs",
 };
 
