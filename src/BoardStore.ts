@@ -52,11 +52,13 @@ interface ActiveConnection {
 interface BoardSettings {
   confirmDeletes: boolean;
   defaultStickyColor: StickyNoteColor;
+  showGrid: boolean;
 }
 
 const DEFAULT_SETTINGS: BoardSettings = {
   confirmDeletes: true,
   defaultStickyColor: STICKY_COLORS[0],
+  showGrid: false,
 };
 
 interface BoardState {

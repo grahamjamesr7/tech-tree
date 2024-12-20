@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import ReactDOM from "react-dom";
 import useBoardStore from "../BoardStore";
 import { STICKY_COLORS } from "../constants";
@@ -19,23 +19,30 @@ interface SettingsMenuProps {
 
 const SettingsMenu: React.FC<SettingsMenuProps> = ({ isOpen, onClose }) => {
   const { settings, changeSettings } = useBoardStore();
+  const [localSettings, setLocalSettings] = useState(settings);
 
-  const handleConfirmDeletesChange = (
-    e: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    changeSettings({
-      ...settings,
-      confirmDeletes: e.target.checked,
-    });
+  // Sync local settings with board settings when opened
+  useEffect(() => {
+    if (isOpen) {
+      setLocalSettings(settings);
+    }
+  }, [isOpen, settings]);
+
+  // Update local settings and sync with board
+  const updateSettings = (updates: Partial<typeof settings>) => {
+    console.debug({ updates });
+    const newSettings = {
+      ...localSettings,
+      ...updates,
+    };
+    setLocalSettings(newSettings);
+    changeSettings(newSettings);
   };
 
   const handleColorChange = (colorName: string) => {
     const newColor = STICKY_COLORS.find((color) => color.name === colorName);
     if (newColor) {
-      changeSettings({
-        ...settings,
-        defaultStickyColor: newColor,
-      });
+      updateSettings({ defaultStickyColor: newColor });
     }
   };
 
@@ -50,7 +57,6 @@ const SettingsMenu: React.FC<SettingsMenuProps> = ({ isOpen, onClose }) => {
         zIndex: 1000,
       }}
       onClick={(e) => {
-        e.preventDefault();
         e.stopPropagation();
       }}
     >
@@ -69,18 +75,32 @@ const SettingsMenu: React.FC<SettingsMenuProps> = ({ isOpen, onClose }) => {
               <X />
             </IconButton>
           </Box>
-
           <FormControlLabel
             control={
               <Checkbox
-                checked={settings.confirmDeletes}
-                onChange={handleConfirmDeletesChange}
+                checked={localSettings.confirmDeletes}
+                onChange={(e) =>
+                  updateSettings({ confirmDeletes: e.target.checked })
+                }
                 color="primary"
               />
             }
             label="Confirm before deleting notes"
           />
-
+          <FormControlLabel
+            control={
+              <Checkbox
+                checked={localSettings.showGrid}
+                onChange={(e) =>
+                  updateSettings({
+                    showGrid: e.target.checked,
+                  })
+                }
+                color="primary"
+              />
+            }
+            label="Show gridlines"
+          />
           <Box>
             <Typography variant="subtitle2" sx={{ mb: 1 }}>
               Default Note Color
@@ -95,7 +115,7 @@ const SettingsMenu: React.FC<SettingsMenuProps> = ({ isOpen, onClose }) => {
                     height: 32,
                     backgroundColor: color.rawColor,
                     border:
-                      settings.defaultStickyColor.name === color.name
+                      localSettings.defaultStickyColor.name === color.name
                         ? "2px solid #555"
                         : "none",
                     "&:hover": {

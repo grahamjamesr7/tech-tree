@@ -52,7 +52,6 @@ export const RadialMenu: React.FC<RadialMenuProps> = ({
         transform: "translate(-50%, -50%)",
       }}
       onClick={(e) => {
-        e.preventDefault();
         e.stopPropagation();
       }}
     >

@@ -103,7 +103,7 @@ const StickyNoteV2: React.FC<StickyNoteProps> = ({ id, x, y }) => {
   }, [isDragging, offset, id, updateNote]);
 
   function handleDelete() {
-    if (!deletionArmed) {
+    if (!deletionArmed && settings.confirmDeletes) {
       setDeletionArmed(true);
     } else {
       deleteNote(id);

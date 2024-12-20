@@ -5,13 +5,33 @@ import StickyNoteV2 from "./StickyNotev2";
 import SettingsMenu from "./SettingsMenu";
 import GlobalMenu from "./GlobalMenu";
 import GlobalTimeline from "./GlobalTimeline";
+import styled from "styled-components";
+
+const GridBackground = styled.div<{ zoom: number }>`
+  position: absolute;
+  inset: 0;
+  opacity: 0.1;
+  background-size: 40px 40px;
+  background-image: linear-gradient(to right, #000 1px, transparent 1px),
+    linear-gradient(to bottom, #000 1px, transparent 1px);
+  transform: ${({ zoom }) => `scale(${zoom})`};
+  transform-origin: 0 0;
+  width: ${({ zoom }) => `${100 / zoom}%`};
+  height: ${({ zoom }) => `${100 / zoom}%`};
+`;
 
 const SpatialBoardV2: React.FC = () => {
-  const [globalMenuOpen, setGlobalMenuOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [activeConnPosition, setActiveConnPosition] = useState({ x: 0, y: 0 });
-  const { notes, connections, zoom, addNote, setZoom, activeConnection } =
-    useBoardStore();
+  const {
+    notes,
+    connections,
+    zoom,
+    addNote,
+    setZoom,
+    activeConnection,
+    settings: boardSettings,
+  } = useBoardStore();
 
   const handleCanvasClick = (e: React.MouseEvent<HTMLDivElement>) => {
     if (activeConnection) {
@@ -79,27 +99,20 @@ const SpatialBoardV2: React.FC = () => {
         isOpen={settingsOpen}
         onClose={() => setSettingsOpen(false)}
       />
-
+      <GlobalMenu setSettingsOpen={setSettingsOpen} />
       <GlobalTimeline />
 
-      <div
-        className="absolute inset-0 bg-grid-pattern opacity-10"
-        style={{
-          transform: `scale(${zoom})`,
-          transformOrigin: "0 0",
-        }}
-      />
+      {/* Grid Background */}
+      {boardSettings.showGrid && <GridBackground zoom={zoom} />}
 
+      {/* Notes and Connections */}
       <div
+        className="absolute inset-0"
         style={{
           transform: `scale(${zoom})`,
           transformOrigin: "0 0",
-          position: "relative",
-          width: "100%",
-          height: "100%",
         }}
       >
-        <GlobalMenu setSettingsOpen={setSettingsOpen} />
         {notes.map((n) => (
           <StickyNoteV2 key={n.id} {...n} />
         ))}
