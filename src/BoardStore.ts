@@ -22,6 +22,7 @@ interface Note {
   size?: StickySize;
   status?: "not-started" | "in-progress" | "done" | "blocked";
   recursive: boolean;
+  color: StickyNoteColor;
 }
 
 export type ConnectionStyle = {
@@ -118,6 +119,7 @@ const useBoardStore = create<BoardState>((set, get) => ({
           title: "",
           content: "",
           recursive: false,
+          color: get().settings.defaultStickyColor,
         },
       ],
     }));

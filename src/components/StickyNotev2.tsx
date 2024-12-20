@@ -49,11 +49,8 @@ const StickyNoteV2: React.FC<StickyNoteProps> = ({ id, x, y }) => {
     x: x,
     y: y,
     recursive: false,
+    color: thisNote.color,
   });
-
-  const [color, setColor] = useState<StickyNoteColor>(
-    settings.defaultStickyColor
-  );
 
   const handleMouseDown = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -140,7 +137,7 @@ const StickyNoteV2: React.FC<StickyNoteProps> = ({ id, x, y }) => {
   return (
     <div
       className={`absolute ${
-        color.bgClass
+        localNote.color.bgClass
       } w-48 h-48 p-4 shadow-lg rounded-sm font-lato flex flex-col
       ${deletionArmed ? "ring-2 ring-red-500" : ""}
       ${activeConnection?.fromId == id ? "ring-2 ring-blue-500" : ""}
@@ -221,13 +218,13 @@ const StickyNoteV2: React.FC<StickyNoteProps> = ({ id, x, y }) => {
                     className={`w-5 h-5 rounded-full ${
                       stickyColor.bgClass
                     } hover:ring-2 ring-gray-400 flex-shrink-0 ${
-                      color.name === stickyColor.name
+                      localNote.color.name === stickyColor.name
                         ? "ring-1 ring-gray-600"
                         : ""
                     }`}
                     onClick={(e) => {
                       e.stopPropagation();
-                      setColor(stickyColor);
+                      setLocalNote({ ...localNote, color: stickyColor });
                       setIsMenuOpen(false);
                     }}
                   />
