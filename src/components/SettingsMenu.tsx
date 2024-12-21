@@ -22,6 +22,7 @@ import CloseIcon from "@mui/icons-material/Close";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import GridOnIcon from "@mui/icons-material/GridOn";
 import PaletteIcon from "@mui/icons-material/Palette";
+import { Numbers } from "@mui/icons-material";
 
 interface SettingsMenuProps {
   isOpen: boolean;
@@ -139,6 +140,28 @@ const SettingsMenu: React.FC<SettingsMenuProps> = ({ isOpen, onClose }) => {
                   fontSize="small"
                 />
                 <Typography variant="body2">Show gridlines</Typography>
+              </Box>
+            }
+          />
+          <FormControlLabel
+            control={
+              <Checkbox
+                checked={localSettings.showPoints}
+                onChange={(e) =>
+                  updateSettings({ showPoints: e.target.checked })
+                }
+                color="primary"
+              />
+            }
+            label={
+              <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                <Numbers
+                  sx={{ color: theme.palette.text.secondary }}
+                  fontSize="small"
+                />
+                <Typography variant="body2">
+                  Use Points Instead of T-Shirt Sizes
+                </Typography>
               </Box>
             }
           />

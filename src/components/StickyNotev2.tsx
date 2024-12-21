@@ -1,7 +1,12 @@
-import React, { useEffect, useState, useCallback } from "react";
-import useBoardStore, { Note, Side } from "../BoardStore";
-import { Move, Trash2 } from "lucide-react";
-import { STICKY_COLORS, StickyNoteColor } from "../constants";
+import React, { useEffect, useState } from "react";
+import useBoardStore, {
+  Side,
+  STICKY_SIZE_COPY_MAP,
+  STICKY_SIZE_NUMERIC_MAP,
+} from "../BoardStore";
+import { Move } from "lucide-react";
+import StickyMenu from "./StickyMenu";
+import { adjustHexColor } from "../utils";
 
 interface StickyNoteProps {
   id: number;
@@ -11,21 +16,19 @@ interface StickyNoteProps {
 
 const StickyNoteV2: React.FC<StickyNoteProps> = ({ id, x, y }) => {
   const {
-    deleteNote,
     startConnection,
     activeConnection,
     cancelConnection,
     endConnection,
     updateNote,
-    settings,
     notes,
+    settings,
   } = useBoardStore();
 
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [deletionArmed, setDeletionArmed] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
   const [offset, setOffset] = useState({ x: 0, y: 0 });
+  const [isEditing, setIsEditing] = useState(false);
 
   const thisNote = notes.find((i) => i.id == id);
   if (!thisNote) {
@@ -42,15 +45,14 @@ const StickyNoteV2: React.FC<StickyNoteProps> = ({ id, x, y }) => {
     );
   }
 
-  const [localNote, setLocalNote] = useState<Note>({
-    title: thisNote.title || "",
-    content: thisNote.content || "",
-    id: id,
-    x: x,
-    y: y,
-    recursive: false,
-    color: thisNote.color,
-  });
+  useEffect(() => {
+    if (isEditing) {
+      const timer = setTimeout(() => {
+        setIsEditing(false);
+      }, 1200);
+      return () => clearTimeout(timer);
+    }
+  }, [isEditing]);
 
   const handleMouseDown = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -72,9 +74,7 @@ const StickyNoteV2: React.FC<StickyNoteProps> = ({ id, x, y }) => {
       const newX = e.clientX - 2 * offset.x + 96;
       const newY = e.clientY + 2 * offset.y + 96;
 
-      const updatedNote = { ...localNote, x: newX, y: newY };
-      setLocalNote(updatedNote);
-      updateNote(updatedNote); // short circuit, we need the connection to move with the sticky
+      updateNote({ id, x: newX, y: newY }); // short circuit, we need the connection to move with the sticky
     };
 
     const handleMouseUp = (e: MouseEvent) => {
@@ -102,14 +102,6 @@ const StickyNoteV2: React.FC<StickyNoteProps> = ({ id, x, y }) => {
     };
   }, [isDragging, offset, id, updateNote]);
 
-  function handleDelete() {
-    if (!deletionArmed && settings.confirmDeletes) {
-      setDeletionArmed(true);
-    } else {
-      deleteNote(id);
-    }
-  }
-
   function connectorClicked(e: React.MouseEvent<HTMLDivElement>, side: Side) {
     e.stopPropagation();
     if (!activeConnection) {
@@ -120,33 +112,18 @@ const StickyNoteV2: React.FC<StickyNoteProps> = ({ id, x, y }) => {
       endConnection(id, side);
     }
   }
-
-  useEffect(() => {
-    const debounceTimeout = setTimeout(() => {
-      // Deep equality check between localNote and thisNote
-      const hasChanged = JSON.stringify(localNote) !== JSON.stringify(thisNote);
-
-      if (hasChanged) {
-        updateNote(localNote);
-      }
-    }, 1000);
-
-    return () => clearTimeout(debounceTimeout);
-  }, [localNote, id, thisNote]);
-
   return (
     <div
       className={`absolute ${
-        localNote.color.bgClass
+        thisNote.color.bgClass
       } w-48 h-48 p-4 shadow-lg rounded-sm font-lato flex flex-col
-      ${deletionArmed ? "ring-2 ring-red-500" : ""}
       ${activeConnection?.fromId == id ? "ring-2 ring-blue-500" : ""}
       ${isDragging ? "cursor-grabbing" : ""}`}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       style={{
-        left: localNote.x,
-        top: localNote.y,
+        left: thisNote.x,
+        top: thisNote.y,
         transform: "translate(-50%, -50%)",
         zIndex: isDragging ? 1000 : 1,
         cursor: isDragging ? "grabbing" : "auto",
@@ -191,69 +168,47 @@ const StickyNoteV2: React.FC<StickyNoteProps> = ({ id, x, y }) => {
           >
             <Move size={16} />
           </button>
-          <button
-            className="px-2 py-1 rounded hover:bg-blue-50 bg-white text-black"
-            onClick={(e) => {
-              e.stopPropagation();
-              setIsMenuOpen(!isMenuOpen);
-            }}
-          >
-            ⋯
-          </button>
         </div>
-        {isMenuOpen && (
-          <div className="relative">
-            <div className="absolute top-0 w-32 bg-white rounded shadow-lg transform translate-x-1/2">
-              <button
-                className="w-full px-4 py-2 text-left hover:bg-blue-50 bg-white text-black flex items-center"
-                onClick={handleDelete}
-              >
-                <Trash2 size={16} className="mr-2" />
-                {deletionArmed ? "You sure?" : "Delete"}
-              </button>
-              <div className="w-full px-4 py-2 flex gap-0.5">
-                {STICKY_COLORS.map((stickyColor) => (
-                  <div
-                    key={stickyColor.name}
-                    className={`w-5 h-5 rounded-full ${
-                      stickyColor.bgClass
-                    } hover:ring-2 ring-gray-400 flex-shrink-0 ${
-                      localNote.color.name === stickyColor.name
-                        ? "ring-1 ring-gray-600"
-                        : ""
-                    }`}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setLocalNote({ ...localNote, color: stickyColor });
-                      setIsMenuOpen(false);
-                    }}
-                  />
-                ))}
-              </div>
-            </div>
-          </div>
-        )}
+        <StickyMenu id={id} isVisible={isHovered} />
       </div>
       <textarea
         className="w-full bg-transparent resize-none border-none focus:outline-none font-lato text-black font-bold text-lg mb-2 h-8"
         placeholder="Title..."
-        onClick={(e) => e.stopPropagation()}
-        value={localNote.title}
+        onClick={(e) => {
+          e.stopPropagation();
+          setIsEditing(true);
+        }}
+        value={thisNote.title}
         onChange={(e) => {
-          const updatedNote = { ...localNote, title: e.target.value };
-          setLocalNote(updatedNote);
+          updateNote({ id, title: e.target.value });
+          setIsEditing(true);
         }}
       />
       <textarea
         className="w-full flex-1 bg-transparent resize-none border-none focus:outline-none font-lato text-black text-sm"
         placeholder="Description..."
         onClick={(e) => e.stopPropagation()}
-        value={localNote.content}
+        value={thisNote.content}
         onChange={(e) => {
-          const updatedNote = { ...localNote, content: e.target.value };
-          setLocalNote(updatedNote);
+          updateNote({ id, content: e.target.value });
+          setIsEditing(true);
         }}
       />
+      {thisNote.size && !isEditing && !isHovered && (
+        <div
+          className={`absolute bottom-2 right-2`}
+          style={{
+            color: adjustHexColor(thisNote.color.rawColor, -0.2),
+            fontWeight: 700,
+            opacity: !isEditing ? 1 : 0,
+            transition: "opacity 1s ease-in-out",
+          }}
+        >
+          {settings.showPoints
+            ? STICKY_SIZE_NUMERIC_MAP[thisNote.size]
+            : STICKY_SIZE_COPY_MAP[thisNote.size]}
+        </div>
+      )}
     </div>
   );
 };
