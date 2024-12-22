@@ -1,6 +1,6 @@
 // src/store/boardStore.ts
 import { create } from "zustand";
-import { STICKY_COLORS, StickyNoteColor } from "./constants";
+import { BAD_ENDING_COLOR, STICKY_COLORS, StickyNoteColor } from "./constants";
 
 type Side = "top" | "right" | "bottom" | "left";
 
@@ -128,10 +128,91 @@ const initSettings: BoardSettings = savedSettings
   ? JSON.parse(savedSettings)
   : DEFAULT_SETTINGS;
 
+const DEFAULT_NOTES: Note[] = [
+  {
+    id: 1,
+    title: "Welcome to Tech-Tree",
+    content: "Check the manifesto, then get started.",
+    x: 256,
+    y: 256,
+    recursive: false,
+    color: initSettings.defaultStickyColor,
+  },
+  {
+    id: 2,
+    title: "Everything Comes From Something",
+    content: "The only way to make new items is to split an existing one.",
+    x: 312,
+    y: 650,
+    recursive: false,
+    color: initSettings.defaultStickyColor,
+  },
+  {
+    id: 3,
+    title: "Agility",
+    content:
+      "This tool can help you run a standard agile workflow. See the size in the bottom right corner \n                                        ⌄",
+    x: 650,
+    y: 256,
+    recursive: false,
+    color: STICKY_COLORS[1],
+    size: "medium",
+  },
+  // {
+  //   id: 4,
+  //   title: "Thank the Maker!",
+  //   content: "This tool is made and maintained by James Graham. Find him",
+  //   x: 1024,
+  //   y: 256,
+  //   recursive: false,
+  //   color: STICKY_COLORS[4],
+  // },
+];
+
+const BAD_ENDING: Note[] = [
+  {
+    id: 666,
+    x: 256,
+    y: 256,
+    recursive: false,
+    color: BAD_ENDING_COLOR,
+    title: "Perhaps you misunderstand",
+    content:
+      "The only way to make stickies is by splitting them. Split this one to make more.",
+  },
+];
+
+const DEFAULT_CONNECTIONS: Connection[] = [
+  {
+    fromId: 1,
+    toId: 2,
+    fromSide: "bottom",
+    toSide: "top",
+    style: {
+      isCurved: false,
+      type: "dependency",
+    },
+    id: 1,
+  },
+  {
+    fromId: 3,
+    toId: 1,
+    fromSide: "left",
+    toSide: "right",
+    style: {
+      isCurved: false,
+      type: "informs",
+    },
+    id: 2,
+  },
+];
+
 const useBoardStore = create<BoardState>((set, get) => ({
   // Initial State
-  notes: initState ? initState.notes || [] : [],
-  connections: initState ? initState.connections || [] : [],
+  notes: initState ? initState.notes || DEFAULT_NOTES : DEFAULT_NOTES,
+  connections: initState
+    ? initState.connections || DEFAULT_CONNECTIONS
+    : DEFAULT_CONNECTIONS,
   zoom: 1,
   activeConnection: null,
   settings: initSettings,
@@ -163,13 +244,23 @@ const useBoardStore = create<BoardState>((set, get) => ({
     }));
   },
 
-  deleteNote: (id) =>
+  deleteNote: (id) => {
     set((state) => ({
       notes: state.notes.filter((note) => note.id !== id),
       connections: state.connections.filter(
         (conn) => conn.fromId !== id && conn.toId !== id
       ),
-    })),
+    }));
+    const notes = get().notes;
+
+    if (notes.length === 0) {
+      setTimeout(() => {
+        set((state) => ({
+          notes: BAD_ENDING,
+        }));
+      }, 3200);
+    }
+  },
 
   splitNote: (noteId: number) => {
     const sourceNote = get().notes.find((note) => note.id === noteId);
@@ -185,10 +276,12 @@ const useBoardStore = create<BoardState>((set, get) => ({
       id: newNoteId,
       x: newX,
       y: newY,
-      title: "",
-      content: "",
+      title: noteId === 666 ? "There you go!" : "",
+      content:
+        noteId === 666 ? "Why the restriction? Check the manifesto." : "",
       recursive: false,
-      color: sourceNote.color, // Inherit color from source note
+      color:
+        noteId === 666 ? get().settings.defaultStickyColor : sourceNote.color, // Inherit color from source note
     };
 
     // Create connection configuration
@@ -297,7 +390,7 @@ const useBoardStore = create<BoardState>((set, get) => ({
   clearBoard: () => {
     localStorage.removeItem("boardState");
     set(() => ({
-      notes: [],
+      notes: DEFAULT_NOTES.slice(0, 1),
       connections: [],
       activeConnection: null,
     }));

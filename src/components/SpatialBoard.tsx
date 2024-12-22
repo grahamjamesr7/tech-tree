@@ -39,22 +39,22 @@ const SpatialBoardV2: React.FC = () => {
       return;
     }
 
-    const rect = e.currentTarget.getBoundingClientRect();
-    let x = (e.clientX - rect.left) / zoom;
-    let y = (e.clientY - rect.top) / zoom;
+    // const rect = e.currentTarget.getBoundingClientRect();
+    // let x = (e.clientX - rect.left) / zoom;
+    // let y = (e.clientY - rect.top) / zoom;
 
-    // Adjust position if too close to edges
-    const edgeBuffer = 96;
-    const offsetAmount = 128;
+    // // Adjust position if too close to edges
+    // const edgeBuffer = 96;
+    // const offsetAmount = 128;
 
-    if (x < edgeBuffer) x = offsetAmount;
-    if (y < edgeBuffer) y = offsetAmount;
-    if (x > rect.width / zoom - edgeBuffer)
-      x = rect.width / zoom - offsetAmount;
-    if (y > rect.height / zoom - edgeBuffer)
-      y = rect.height / zoom - offsetAmount;
+    // if (x < edgeBuffer) x = offsetAmount;
+    // if (y < edgeBuffer) y = offsetAmount;
+    // if (x > rect.width / zoom - edgeBuffer)
+    //   x = rect.width / zoom - offsetAmount;
+    // if (y > rect.height / zoom - edgeBuffer)
+    //   y = rect.height / zoom - offsetAmount;
 
-    addNote(x, y);
+    // addNote(x, y);
   };
 
   const handleWheel = (e: React.WheelEvent) => {

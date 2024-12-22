@@ -11,3 +11,9 @@ export const STICKY_COLORS: StickyNoteColor[] = [
   { name: "Pink", bgClass: "bg-pink-100", rawColor: "#fce7f3" },
   { name: "Purple", bgClass: "bg-purple-100", rawColor: "#f3e8ff" },
 ];
+
+export const BAD_ENDING_COLOR: StickyNoteColor = {
+  name: "red",
+  bgClass: "bg-red-200",
+  rawColor: "#ff0000",
+};

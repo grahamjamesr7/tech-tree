@@ -172,16 +172,34 @@ const StickyNoteV2: React.FC<StickyNoteProps> = ({ id, x, y }) => {
         <StickyMenu id={id} isVisible={isHovered} />
       </div>
       <textarea
-        className="w-full bg-transparent resize-none border-none focus:outline-none font-lato text-black font-bold text-lg mb-2 h-8"
+        className="w-full bg-transparent resize-none border-none focus:outline-none font-lato text-black font-bold text-lg mb-2"
+        style={{
+          height: "1.5rem",
+          minHeight: "1.5rem",
+          maxHeight: "3rem",
+          lineHeight: "1.5rem",
+          overflow: "hidden",
+        }}
         placeholder="Title..."
         onClick={(e) => {
           e.stopPropagation();
           setIsEditing(true);
         }}
         value={thisNote.title}
+        ref={(textarea) => {
+          if (textarea) {
+            textarea.style.height = "1.5rem";
+            const scrollHeight = Math.min(textarea.scrollHeight, 48);
+            textarea.style.height = scrollHeight + "px";
+          }
+        }}
         onChange={(e) => {
           updateNote({ id, title: e.target.value });
           setIsEditing(true);
+          // Automatically adjust height based on content
+          e.target.style.height = "1.5rem";
+          const scrollHeight = Math.min(e.target.scrollHeight, 48);
+          e.target.style.height = scrollHeight + "px";
         }}
       />
       <textarea
