@@ -6,6 +6,7 @@ import SettingsMenu from "./SettingsMenu";
 import GlobalMenu from "./GlobalMenu";
 import GlobalTimeline from "./GlobalTimeline";
 import styled from "styled-components";
+import ManifestoContainer from "./ManifestoContainer";
 
 const GridBackground = styled.div<{ zoom: number }>`
   position: absolute;
@@ -31,6 +32,7 @@ const SpatialBoardV2: React.FC = () => {
     setZoom,
     activeConnection,
     settings: boardSettings,
+    manifestoOpen,
   } = useBoardStore();
 
   const handleCanvasClick = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -101,6 +103,7 @@ const SpatialBoardV2: React.FC = () => {
       />
       <GlobalMenu setSettingsOpen={setSettingsOpen} />
       <GlobalTimeline />
+      {manifestoOpen && <ManifestoContainer />}
 
       {/* Grid Background */}
       {boardSettings.showGrid && <GridBackground zoom={zoom} />}

@@ -1,6 +1,13 @@
 import React, { useState } from "react";
 import { SpeedDial, SpeedDialAction } from "@mui/material";
-import { Ellipsis, Save, Settings2, Trash2, Check } from "lucide-react";
+import {
+  Ellipsis,
+  Save,
+  Settings2,
+  Trash2,
+  Check,
+  Newspaper,
+} from "lucide-react";
 import useBoardStore from "../BoardStore";
 
 interface GlobalMenuProps {
@@ -9,7 +16,7 @@ interface GlobalMenuProps {
 
 const GlobalMenu: React.FC<GlobalMenuProps> = ({ setSettingsOpen }) => {
   const [armed, setArmed] = useState(false);
-  const { clearBoard, saveBoard } = useBoardStore();
+  const { clearBoard, saveBoard, openManifesto } = useBoardStore();
   const [saveSuccess, setSaveSuccess] = useState(false);
 
   const handleSave = (e: React.MouseEvent) => {
@@ -89,6 +96,16 @@ const GlobalMenu: React.FC<GlobalMenuProps> = ({ setSettingsOpen }) => {
         tooltipOpen
         tooltipPlacement="right"
       />
+      {/* <SpeedDialAction
+        icon={<Newspaper size={20} />}
+        tooltipTitle="Read Manifesto"
+        onClick={(e) => {
+          e.stopPropagation();
+          openManifesto();
+        }}
+        tooltipOpen
+        tooltipPlacement="right"
+      /> */}
     </SpeedDial>
   );
 };

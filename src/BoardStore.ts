@@ -93,6 +93,11 @@ interface BoardState {
   zoom: number;
   activeConnection: ActiveConnection | null;
   settings: BoardSettings;
+  manifestoOpen: boolean;
+
+  // global UI actions
+  openManifesto: () => void;
+  closeManifesto: () => void;
 
   // Note Actions
   addNote: (x: number, y: number) => void;
@@ -216,6 +221,10 @@ const useBoardStore = create<BoardState>((set, get) => ({
   zoom: 1,
   activeConnection: null,
   settings: initSettings,
+  manifestoOpen: false,
+
+  openManifesto: () => set((state) => ({ ...state, manifestoOpen: true })),
+  closeManifesto: () => set((state) => ({ ...state, manifestoOpen: false })),
 
   // Note Actions
   addNote: (x, y) => {
