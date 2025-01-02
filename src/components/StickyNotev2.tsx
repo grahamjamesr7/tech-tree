@@ -212,7 +212,7 @@ const StickyNoteV2: React.FC<StickyNoteProps> = ({ id, x, y }) => {
           setIsEditing(true);
         }}
       />
-      {thisNote.size && !isEditing && !isHovered && (
+      {thisNote.size && !isEditing && (
         <div
           className={`absolute bottom-2 right-2`}
           style={{

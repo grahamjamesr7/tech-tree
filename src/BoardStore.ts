@@ -137,7 +137,7 @@ const DEFAULT_NOTES: Note[] = [
   {
     id: 1,
     title: "Welcome to Tech-Tree",
-    content: "Check the manifesto, then get started.",
+    content: "To start, simply use the tool. To stop, do the opposite.",
     x: 256,
     y: 256,
     recursive: false,
