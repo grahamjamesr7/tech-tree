@@ -21,6 +21,9 @@ const GridBackground = styled.div<{ zoom: number }>`
   height: ${({ zoom }) => `${100 / zoom}%`};
 `;
 
+const MIN_ZOOM = 0.1;
+const MAX_ZOOM = 1.0;
+
 const SpatialBoardV2: React.FC = () => {
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [activeConnPosition, setActiveConnPosition] = useState({ x: 0, y: 0 });
@@ -34,6 +37,9 @@ const SpatialBoardV2: React.FC = () => {
     settings: boardSettings,
     manifestoOpen,
   } = useBoardStore();
+
+  // Add new state at the top with other state declarations
+  const [boardPosition, setBoardPosition] = useState({ x: 0, y: 0 });
 
   const handleCanvasClick = (e: React.MouseEvent<HTMLDivElement>) => {
     if (activeConnection) {
@@ -62,8 +68,27 @@ const SpatialBoardV2: React.FC = () => {
   const handleWheel = (e: React.WheelEvent) => {
     if (e.ctrlKey) {
       e.preventDefault();
+
+      // Get cursor position relative to board
+      const rect = e.currentTarget.getBoundingClientRect();
+      const cursorX = e.clientX - rect.left;
+      const cursorY = e.clientY - rect.top;
+
+      // Calculate new zoom
       const delta = e.deltaY > 0 ? 0.9 : 1.1;
-      setZoom(Math.min(Math.max(zoom * delta, 0.1), 5));
+      const newZoom = Math.min(Math.max(zoom * delta, MIN_ZOOM), MAX_ZOOM);
+
+      // Calculate position adjustment to keep cursor in same spot
+      const scaleChange = newZoom - zoom;
+      const moveX = (cursorX - boardPosition.x) * (scaleChange / zoom);
+      const moveY = (cursorY - boardPosition.y) * (scaleChange / zoom);
+
+      // Update state
+      setZoom(newZoom);
+      setBoardPosition((prev) => ({
+        x: prev.x - moveX,
+        y: prev.y - moveY,
+      }));
     }
   };
 
@@ -91,6 +116,44 @@ const SpatialBoardV2: React.FC = () => {
     }
   }, [activeConnection]);
 
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      const panAmount = 50; // pixels to move per keypress
+
+      switch (e.key) {
+        case "ArrowLeft":
+          setBoardPosition((prev) => ({ ...prev, x: prev.x + panAmount }));
+          break;
+        case "ArrowRight":
+          setBoardPosition((prev) => ({ ...prev, x: prev.x - panAmount }));
+          break;
+        case "ArrowUp":
+          setBoardPosition((prev) => ({ ...prev, y: prev.y + panAmount }));
+          break;
+        case "ArrowDown":
+          setBoardPosition((prev) => ({ ...prev, y: prev.y - panAmount }));
+          break;
+        case "+":
+          if (e.ctrlKey) {
+            e.preventDefault();
+            const newZoom = Math.min(zoom * 1.1, MAX_ZOOM);
+            setZoom(newZoom);
+          }
+          break;
+        case "-":
+          if (e.ctrlKey) {
+            e.preventDefault();
+            const newZoom = Math.min(zoom * 0.9, MIN_ZOOM);
+            setZoom(Math.max(newZoom));
+          }
+          break;
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, []);
+
   return (
     <div
       className="relative w-full h-screen bg-white overflow-hidden font-lato"
@@ -112,7 +175,7 @@ const SpatialBoardV2: React.FC = () => {
       <div
         className="absolute inset-0"
         style={{
-          transform: `scale(${zoom})`,
+          transform: `translate(${boardPosition.x}px, ${boardPosition.y}px) scale(${zoom})`,
           transformOrigin: "0 0",
         }}
       >

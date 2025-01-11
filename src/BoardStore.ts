@@ -146,9 +146,10 @@ const DEFAULT_NOTES: Note[] = [
   {
     id: 2,
     title: "Everything Comes From Something",
-    content: "The only way to make new items is to split an existing one.",
-    x: 312,
-    y: 650,
+    content:
+      "The only way to make new items is to split an existing one. \nHover this one, then hit split.",
+    x: 922,
+    y: 512,
     recursive: false,
     color: initSettings.defaultStickyColor,
   },
@@ -162,6 +163,16 @@ const DEFAULT_NOTES: Note[] = [
     recursive: false,
     color: STICKY_COLORS[1],
     size: "medium",
+  },
+  {
+    id: 4,
+    title: "Never Stop Moving",
+    content:
+      "You can navigate with the arrow keys. To zoom in or out, hold ctrl and either scroll or use the +/- keys.",
+    x: 512,
+    y: 672,
+    recursive: false,
+    color: STICKY_COLORS[2],
   },
   // {
   //   id: 4,
@@ -189,12 +200,12 @@ const BAD_ENDING: Note[] = [
 
 const DEFAULT_CONNECTIONS: Connection[] = [
   {
-    fromId: 1,
+    fromId: 4,
     toId: 2,
-    fromSide: "bottom",
-    toSide: "top",
+    fromSide: "right",
+    toSide: "left",
     style: {
-      isCurved: false,
+      isCurved: true,
       type: "dependency",
     },
     id: 1,
@@ -209,6 +220,17 @@ const DEFAULT_CONNECTIONS: Connection[] = [
       type: "informs",
     },
     id: 2,
+  },
+  {
+    fromId: 1,
+    toId: 4,
+    fromSide: "bottom",
+    toSide: "top",
+    style: {
+      isCurved: true,
+      type: "informs",
+    },
+    id: 3,
   },
 ];
 
