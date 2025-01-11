@@ -36,12 +36,19 @@ export const STICKY_SIZE_NUMERIC_MAP: Record<StickySize, number> = {
   "too-big": 21,
 };
 
+interface StickyContent {
+  context?: string;
+  objective?: string;
+  acceptanceCriteria?: string;
+  summary?: string;
+}
+
 interface Note {
   id: number;
   x: number;
   y: number;
   title: string;
-  content: string;
+  content: StickyContent;
   size?: StickySize;
   status?: "not-started" | "in-progress" | "done" | "blocked";
   recursive: boolean;
@@ -137,7 +144,9 @@ const DEFAULT_NOTES: Note[] = [
   {
     id: 1,
     title: "Welcome to Tech-Tree",
-    content: "To start, simply use the tool. To stop, do the opposite.",
+    content: {
+      summary: "To start, simply use the tool. To stop, do the opposite.",
+    },
     x: 256,
     y: 256,
     recursive: false,
@@ -146,8 +155,10 @@ const DEFAULT_NOTES: Note[] = [
   {
     id: 2,
     title: "Everything Comes From Something",
-    content:
-      "The only way to make new items is to split an existing one. \nHover this one, then hit split.",
+    content: {
+      summary:
+        "The only way to make new items is to split an existing one. \nHover this one, then hit split.",
+    },
     x: 922,
     y: 512,
     recursive: false,
@@ -156,8 +167,10 @@ const DEFAULT_NOTES: Note[] = [
   {
     id: 3,
     title: "Agility",
-    content:
-      "This tool can help you run a standard agile workflow. See the size in the bottom right corner \n                                        ⌄",
+    content: {
+      summary:
+        "This tool can help you run a standard agile workflow. See the size in the bottom right corner \n                                        ⌄",
+    },
     x: 650,
     y: 256,
     recursive: false,
@@ -167,8 +180,10 @@ const DEFAULT_NOTES: Note[] = [
   {
     id: 4,
     title: "Never Stop Moving",
-    content:
-      "You can navigate with the arrow keys. To zoom in or out, hold ctrl and either scroll or use the +/- keys.",
+    content: {
+      summary:
+        "You can navigate with the arrow keys. To zoom in or out, hold ctrl and either scroll or use the +/- keys.",
+    },
     x: 512,
     y: 672,
     recursive: false,
@@ -193,8 +208,10 @@ const BAD_ENDING: Note[] = [
     recursive: false,
     color: BAD_ENDING_COLOR,
     title: "Perhaps you misunderstand",
-    content:
-      "The only way to make stickies is by splitting them. Split this one to make more.",
+    content: {
+      summary:
+        "The only way to make stickies is by splitting them. Split this one to make more.",
+    },
   },
 ];
 
@@ -258,7 +275,7 @@ const useBoardStore = create<BoardState>((set, get) => ({
           x,
           y,
           title: "",
-          content: "",
+          content: {},
           recursive: false,
           color: get().settings.defaultStickyColor,
         },
@@ -308,8 +325,12 @@ const useBoardStore = create<BoardState>((set, get) => ({
       x: newX,
       y: newY,
       title: noteId === 666 ? "There you go!" : "",
-      content:
-        noteId === 666 ? "Why the restriction? Check the manifesto." : "",
+      content: {
+        summary:
+          noteId === 666
+            ? "Why the restriction? Check the manifesto."
+            : undefined,
+      },
       recursive: false,
       color:
         noteId === 666 ? get().settings.defaultStickyColor : sourceNote.color, // Inherit color from source note

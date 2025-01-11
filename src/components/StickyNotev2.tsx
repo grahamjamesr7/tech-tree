@@ -206,9 +206,9 @@ const StickyNoteV2: React.FC<StickyNoteProps> = ({ id, x, y }) => {
         className="w-full flex-1 bg-transparent resize-none border-none focus:outline-none font-lato text-black text-sm"
         placeholder="Description..."
         onClick={(e) => e.stopPropagation()}
-        value={thisNote.content}
+        value={thisNote.content.summary}
         onChange={(e) => {
-          updateNote({ id, content: e.target.value });
+          updateNote({ id, content: { summary: e.target.value } });
           setIsEditing(true);
         }}
       />
