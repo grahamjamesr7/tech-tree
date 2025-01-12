@@ -7,6 +7,7 @@ import GlobalMenu from "./GlobalMenu";
 import GlobalTimeline from "./GlobalTimeline";
 import styled from "styled-components";
 import ManifestoContainer from "./ManifestoContainer";
+import { getOppositeSide } from "../utils";
 
 const GridBackground = styled.div<{ zoom: number }>`
   position: absolute;
@@ -33,6 +34,8 @@ const SpatialBoardV2: React.FC = () => {
     zoom,
     addNote,
     setZoom,
+    endConnection,
+    cancelConnection,
     activeConnection,
     settings: boardSettings,
     manifestoOpen,
@@ -42,27 +45,27 @@ const SpatialBoardV2: React.FC = () => {
   const [boardPosition, setBoardPosition] = useState({ x: 0, y: 0 });
 
   const handleCanvasClick = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (activeConnection) {
-      useBoardStore.getState().cancelConnection();
-      return;
+    if (activeConnection && boardSettings.createNewOnCanvasClick) {
+      const rect = e.currentTarget.getBoundingClientRect();
+      let x = (e.clientX - rect.left - boardPosition.x) / zoom;
+      let y = (e.clientY - rect.top - boardPosition.y) / zoom;
+
+      // Add edge buffer checks
+      const edgeBuffer = 96;
+      const offsetAmount = 128;
+
+      if (x < edgeBuffer) x = offsetAmount;
+      if (y < edgeBuffer) y = offsetAmount;
+      if (x > rect.width / zoom - edgeBuffer)
+        x = rect.width / zoom - offsetAmount;
+      if (y > rect.height / zoom - edgeBuffer)
+        y = rect.height / zoom - offsetAmount;
+
+      const newId = addNote(x, y);
+      endConnection(newId, getOppositeSide(activeConnection.fromSide));
+    } else if (activeConnection) {
+      cancelConnection();
     }
-
-    // const rect = e.currentTarget.getBoundingClientRect();
-    // let x = (e.clientX - rect.left) / zoom;
-    // let y = (e.clientY - rect.top) / zoom;
-
-    // // Adjust position if too close to edges
-    // const edgeBuffer = 96;
-    // const offsetAmount = 128;
-
-    // if (x < edgeBuffer) x = offsetAmount;
-    // if (y < edgeBuffer) y = offsetAmount;
-    // if (x > rect.width / zoom - edgeBuffer)
-    //   x = rect.width / zoom - offsetAmount;
-    // if (y > rect.height / zoom - edgeBuffer)
-    //   y = rect.height / zoom - offsetAmount;
-
-    // addNote(x, y);
   };
 
   const handleWheel = (e: React.WheelEvent) => {

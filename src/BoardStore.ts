@@ -1,4 +1,3 @@
-// src/store/boardStore.ts
 import { create } from "zustand";
 import { BAD_ENDING_COLOR, STICKY_COLORS, StickyNoteColor } from "./constants";
 
@@ -84,6 +83,7 @@ interface BoardSettings {
   defaultStickyColor: StickyNoteColor;
   showGrid: boolean;
   showPoints: boolean;
+  createNewOnCanvasClick: boolean;
 }
 
 const DEFAULT_SETTINGS: BoardSettings = {
@@ -91,6 +91,7 @@ const DEFAULT_SETTINGS: BoardSettings = {
   defaultStickyColor: STICKY_COLORS[0],
   showGrid: false,
   showPoints: true,
+  createNewOnCanvasClick: true,
 };
 
 interface BoardState {
@@ -107,7 +108,7 @@ interface BoardState {
   closeManifesto: () => void;
 
   // Note Actions
-  addNote: (x: number, y: number) => void;
+  addNote: (x: number, y: number) => number;
   updateNote: (newNote: Partial<Note> & { id: number }) => void;
   deleteNote: (id: number) => void;
   splitNote: (noteId: number) => void;
@@ -150,7 +151,7 @@ const DEFAULT_NOTES: Note[] = [
     x: 256,
     y: 256,
     recursive: false,
-    color: initSettings.defaultStickyColor,
+    color: STICKY_COLORS[0],
   },
   {
     id: 2,
@@ -162,7 +163,7 @@ const DEFAULT_NOTES: Note[] = [
     x: 922,
     y: 512,
     recursive: false,
-    color: initSettings.defaultStickyColor,
+    color: STICKY_COLORS[0],
   },
   {
     id: 3,
@@ -267,11 +268,12 @@ const useBoardStore = create<BoardState>((set, get) => ({
 
   // Note Actions
   addNote: (x, y) => {
+    const newId = Date.now();
     set((state) => ({
       notes: [
         ...state.notes,
         {
-          id: Date.now(),
+          id: newId,
           x,
           y,
           title: "",
@@ -281,6 +283,7 @@ const useBoardStore = create<BoardState>((set, get) => ({
         },
       ],
     }));
+    return newId;
   },
 
   updateNote: (newNote) => {

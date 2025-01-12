@@ -1,3 +1,5 @@
+import { Side } from "./BoardStore";
+
 /**
  * Adjusts a hex color by a given percentage
  * @param hex The hex color to adjust (e.g., "#dbeafe")
@@ -23,4 +25,17 @@ export function adjustHexColor(hex: string, amount: number = 0.1): string {
   const newB = adjustChannel(b).toString(16).padStart(2, "0");
 
   return `#${newR}${newG}${newB}`;
+}
+
+export function getOppositeSide(side: Side): Side {
+  switch (side) {
+    case "bottom":
+      return "top";
+    case "top":
+      return "bottom";
+    case "left":
+      return "right";
+    case "right":
+      return "left";
+  }
 }

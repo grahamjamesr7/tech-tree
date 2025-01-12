@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Trash2, Ellipsis, Minus, ArrowRight, X } from "lucide-react";
+import { Trash2, X } from "lucide-react";
 import useBoardStore, {
   ConnectionStyle,
   getConnectionPoint,
@@ -16,23 +16,6 @@ interface RadialMenuProps {
   onStyleChange: (style: Partial<ConnectionStyle>) => void;
   onDelete: () => void;
   close: () => void;
-}
-
-function getIncomingArrowRotation(
-  side: "top" | "right" | "bottom" | "left"
-): number {
-  switch (side) {
-    case "top":
-      return 90; // Point upward
-    default:
-      return 0;
-    case "right":
-      return 180; // Point rightward
-    case "bottom":
-      return 270; // Point downward
-    case "left":
-      return 0; // Point leftward
-  }
 }
 
 function calculateArrowRotation(

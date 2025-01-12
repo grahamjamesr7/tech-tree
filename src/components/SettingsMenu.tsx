@@ -165,6 +165,29 @@ const SettingsMenu: React.FC<SettingsMenuProps> = ({ isOpen, onClose }) => {
               </Box>
             }
           />
+          <FormControlLabel
+            control={
+              <Checkbox
+                checked={localSettings.createNewOnCanvasClick}
+                onChange={(e) =>
+                  updateSettings({ createNewOnCanvasClick: e.target.checked })
+                }
+                color="primary"
+              />
+            }
+            label={
+              <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                <Numbers
+                  sx={{ color: theme.palette.text.secondary }}
+                  fontSize="small"
+                />
+                <Typography variant="body2">
+                  Create a new sticky when making a new connection and the board
+                  is clicked.
+                </Typography>
+              </Box>
+            }
+          />
         </FormGroup>
 
         <Box sx={{ mb: 2 }}>
