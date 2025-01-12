@@ -1,12 +1,9 @@
 import React, { useEffect, useState } from "react";
-import useBoardStore, {
-  Side,
-  STICKY_SIZE_COPY_MAP,
-  STICKY_SIZE_NUMERIC_MAP,
-} from "../BoardStore";
+import useBoardStore, { Side } from "../BoardStore";
 import { Move } from "lucide-react";
 import StickyMenu from "./StickyMenu";
 import { adjustHexColor } from "../utils";
+import { STICKY_SIZE_COPY_MAP, STICKY_SIZE_NUMERIC_MAP } from "../constants";
 
 interface StickyNoteProps {
   id: number;

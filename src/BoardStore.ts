@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { BAD_ENDING_COLOR, STICKY_COLORS, StickyNoteColor } from "./constants";
+import { BAD_ENDING, STICKY_COLORS, StickyNoteColor } from "./constants";
 
 type Side = "top" | "right" | "bottom" | "left";
 
@@ -14,26 +14,6 @@ export const STICKY_SIZES = {
 } as const;
 
 export type StickySize = (typeof STICKY_SIZES)[keyof typeof STICKY_SIZES];
-
-export const STICKY_SIZE_COPY_MAP: Record<StickySize, string> = {
-  trivial: "XXS",
-  "extra-small": "XS",
-  small: "S",
-  medium: "M",
-  large: "L",
-  "extra-large": "XL",
-  "too-big": "XXL",
-};
-
-export const STICKY_SIZE_NUMERIC_MAP: Record<StickySize, number> = {
-  trivial: 1,
-  "extra-small": 2,
-  small: 3,
-  medium: 5,
-  large: 8,
-  "extra-large": 13,
-  "too-big": 21,
-};
 
 interface StickyContent {
   context?: string;
@@ -199,21 +179,6 @@ const DEFAULT_NOTES: Note[] = [
   //   recursive: false,
   //   color: STICKY_COLORS[4],
   // },
-];
-
-const BAD_ENDING: Note[] = [
-  {
-    id: 666,
-    x: 256,
-    y: 256,
-    recursive: false,
-    color: BAD_ENDING_COLOR,
-    title: "Perhaps you misunderstand",
-    content: {
-      summary:
-        "The only way to make stickies is by splitting them. Split this one to make more.",
-    },
-  },
 ];
 
 const DEFAULT_CONNECTIONS: Connection[] = [
