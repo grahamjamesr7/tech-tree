@@ -1,0 +1,90 @@
+import {
+  Button,
+  ButtonGroup,
+  darken,
+  IconButton,
+  Paper,
+  Tooltip,
+} from "@mui/material";
+import { BoxSelectIcon, Keyboard, Plus } from "lucide-react";
+import React, { ReactNode } from "react";
+import useBoardStore, { EditMode } from "../BoardStore";
+import { STICKY_COLORS } from "../constants";
+
+interface Mode {
+  tooltip: string;
+  icon: ReactNode;
+  mode: EditMode;
+}
+
+export default function GlobalToolbar() {
+  const { editMode: currentMode, changeMode } = useBoardStore();
+
+  const modes: Mode[] = [
+    {
+      tooltip: "(E) - Execute/Worker Mode",
+      icon: <Keyboard fontSize={24} />,
+      mode: "execute",
+    },
+    {
+      tooltip: "(A) - Add/Edit Mode",
+      icon: <Plus fontSize={24} />,
+      mode: "add",
+    },
+    {
+      tooltip: "(S) - Select/Arrange Mode",
+      icon: <BoxSelectIcon fontSize={24} />,
+      mode: "select",
+    },
+  ];
+
+  // TODO: add keyboard shortcuts
+
+  return (
+    <Paper
+      elevation={1}
+      sx={{
+        borderRadius: "1rem",
+        padding: "0.5rem",
+        position: "fixed",
+        top: "1rem",
+        left: "50%",
+        transform: "translateX(-50%)",
+        backgroundColor: "white",
+      }}
+    >
+      <ButtonGroup
+        sx={{
+          "& .MuiButtonGroup-grouped": {
+            borderRadius: "999px !important",
+            minWidth: "3rem",
+            padding: "0.5rem",
+            border: "none",
+            margin: "0 0.5rem", // Increased from 0.25rem to 0.5rem
+          },
+          gap: "0.5rem", // Added gap property
+        }}
+        size="large"
+      >
+        {modes.map((m) => (
+          <Tooltip title={m.tooltip}>
+            <IconButton
+              sx={{
+                borderRadius: "1rem",
+                backgroundColor:
+                  currentMode == m.mode ? STICKY_COLORS[0].rawColor : "#f5f5f5",
+                "&:hover": {
+                  backgroundColor: darken(STICKY_COLORS[0].rawColor, 0.05),
+                },
+              }}
+              size="large"
+              onClick={() => changeMode(m.mode)}
+            >
+              {m.icon}
+            </IconButton>
+          </Tooltip>
+        ))}
+      </ButtonGroup>
+    </Paper>
+  );
+}

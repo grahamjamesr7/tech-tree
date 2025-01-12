@@ -1,5 +1,11 @@
 import { create } from "zustand";
-import { BAD_ENDING, STICKY_COLORS, StickyNoteColor } from "./constants";
+import {
+  BAD_ENDING,
+  DEFAULT_CONNECTIONS,
+  DEFAULT_NOTES,
+  STICKY_COLORS,
+  StickyNoteColor,
+} from "./constants";
 
 type Side = "top" | "right" | "bottom" | "left";
 
@@ -14,6 +20,8 @@ export const STICKY_SIZES = {
 } as const;
 
 export type StickySize = (typeof STICKY_SIZES)[keyof typeof STICKY_SIZES];
+
+export type EditMode = "add" | "select" | "execute";
 
 interface StickyContent {
   context?: string;
@@ -88,10 +96,12 @@ interface BoardState {
   settings: BoardSettings;
   manifestoOpen: boolean;
   currentPan: Point;
+  editMode: EditMode;
 
   // global UI actions
   openManifesto: () => void;
   closeManifesto: () => void;
+  changeMode: (newMode: EditMode) => void;
 
   // Note Actions
   addNote: (x: number, y: number) => number;
@@ -130,102 +140,6 @@ const initSettings: BoardSettings = savedSettings
   ? JSON.parse(savedSettings)
   : DEFAULT_SETTINGS;
 
-const DEFAULT_NOTES: Note[] = [
-  {
-    id: 1,
-    title: "Welcome to Tech-Tree",
-    content: {
-      summary: "To start, simply use the tool. To stop, do the opposite.",
-    },
-    x: 256,
-    y: 256,
-    recursive: false,
-    color: STICKY_COLORS[0],
-  },
-  {
-    id: 2,
-    title: "Everything Comes From Something",
-    content: {
-      summary:
-        "The only way to make new items is to split an existing one. \nHover this one, then hit split.",
-    },
-    x: 922,
-    y: 512,
-    recursive: false,
-    color: STICKY_COLORS[0],
-  },
-  {
-    id: 3,
-    title: "Agility",
-    content: {
-      summary:
-        "This tool can help you run a standard agile workflow. See the size in the bottom right corner \n                                        ⌄",
-    },
-    x: 650,
-    y: 256,
-    recursive: false,
-    color: STICKY_COLORS[1],
-    size: "medium",
-  },
-  {
-    id: 4,
-    title: "Never Stop Moving",
-    content: {
-      summary:
-        "You can navigate with the arrow keys. To zoom in or out, hold ctrl and either scroll or use the +/- keys.",
-    },
-    x: 512,
-    y: 672,
-    recursive: false,
-    color: STICKY_COLORS[2],
-  },
-  // {
-  //   id: 4,
-  //   title: "Thank the Maker!",
-  //   content: "This tool is made and maintained by James Graham. Find him",
-  //   x: 1024,
-  //   y: 256,
-  //   recursive: false,
-  //   color: STICKY_COLORS[4],
-  // },
-];
-
-const DEFAULT_CONNECTIONS: Connection[] = [
-  {
-    fromId: 4,
-    toId: 2,
-    fromSide: "right",
-    toSide: "left",
-    style: {
-      isCurved: true,
-      type: "dependency",
-    },
-    id: 1,
-  },
-  {
-    fromId: 3,
-    toId: 1,
-    fromSide: "left",
-    toSide: "right",
-    style: {
-      isCurved: false,
-      type: "informs",
-    },
-    id: 2,
-  },
-  {
-    fromId: 1,
-    toId: 4,
-    fromSide: "bottom",
-    toSide: "top",
-    style: {
-      isCurved: true,
-      type: "informs",
-    },
-    id: 3,
-  },
-];
-
 const useBoardStore = create<BoardState>((set, get) => ({
   // Initial State
   notes: initState ? initState.notes || DEFAULT_NOTES : DEFAULT_NOTES,
@@ -237,9 +151,13 @@ const useBoardStore = create<BoardState>((set, get) => ({
   settings: initSettings,
   manifestoOpen: false,
   currentPan: { x: 0, y: 0 },
+  editMode: "add",
 
   openManifesto: () => set((state) => ({ ...state, manifestoOpen: true })),
   closeManifesto: () => set((state) => ({ ...state, manifestoOpen: false })),
+
+  // Mode Actions
+  changeMode: (newMode) => set((state) => ({ ...state, editMode: newMode })),
 
   // Note Actions
   addNote: (x, y) => {

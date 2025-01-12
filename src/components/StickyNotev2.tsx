@@ -28,6 +28,7 @@ const StickyNoteV2: React.FC<StickyNoteProps> = ({ id, x, y }) => {
   const [isEditing, setIsEditing] = useState(false);
 
   const thisNote = notes.find((i) => i.id == id);
+
   if (!thisNote) {
     return (
       <div className="flex flex-col items-center justify-center">

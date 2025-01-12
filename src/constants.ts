@@ -1,4 +1,4 @@
-import { Note, StickySize } from "./BoardStore";
+import { Connection, Note, StickySize } from "./BoardStore";
 
 export interface StickyNoteColor {
   name: string;
@@ -32,6 +32,102 @@ export const BAD_ENDING: Note[] = [
       summary:
         "The only way to make stickies is by splitting them. Split this one to make more.",
     },
+  },
+];
+
+export const DEFAULT_NOTES: Note[] = [
+  {
+    id: 1,
+    title: "Welcome to Tech-Tree",
+    content: {
+      summary: "To start, simply use the tool. To stop, do the opposite.",
+    },
+    x: 256,
+    y: 256,
+    recursive: false,
+    color: STICKY_COLORS[0],
+  },
+  {
+    id: 2,
+    title: "Everything Comes From Something",
+    content: {
+      summary:
+        "To make a new sticky, start with a connector. \nOr, split an existing one from the hover menu.",
+    },
+    x: 922,
+    y: 512,
+    recursive: false,
+    color: STICKY_COLORS[0],
+  },
+  {
+    id: 3,
+    title: "Agility",
+    content: {
+      summary:
+        "This tool can help you run a standard agile workflow. See the size in the bottom right corner \n                                        ⌄",
+    },
+    x: 220,
+    y: 601,
+    recursive: false,
+    color: STICKY_COLORS[1],
+    size: "medium",
+  },
+  {
+    id: 4,
+    title: "Never Stop Moving",
+    content: {
+      summary:
+        "You can navigate with the arrow keys. To zoom in or out, hold ctrl and either scroll or use the +/- keys.",
+    },
+    x: 512,
+    y: 672,
+    recursive: false,
+    color: STICKY_COLORS[2],
+  },
+  // {
+  //   id: 4,
+  //   title: "Thank the Maker!",
+  //   content: "This tool is made and maintained by James Graham. Find him",
+  //   x: 1024,
+  //   y: 256,
+  //   recursive: false,
+  //   color: STICKY_COLORS[4],
+  // },
+];
+
+export const DEFAULT_CONNECTIONS: Connection[] = [
+  {
+    fromId: 4,
+    toId: 2,
+    fromSide: "right",
+    toSide: "left",
+    style: {
+      isCurved: true,
+      type: "dependency",
+    },
+    id: 1,
+  },
+  {
+    fromId: 1,
+    toId: 3,
+    fromSide: "bottom",
+    toSide: "top",
+    style: {
+      isCurved: true,
+      type: "informs",
+    },
+    id: 2,
+  },
+  {
+    fromId: 1,
+    toId: 4,
+    fromSide: "bottom",
+    toSide: "top",
+    style: {
+      isCurved: true,
+      type: "informs",
+    },
+    id: 3,
   },
 ];
 
