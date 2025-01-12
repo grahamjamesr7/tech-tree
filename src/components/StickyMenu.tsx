@@ -1,13 +1,11 @@
 import React, { useState } from "react";
-import { Trash2, Move } from "lucide-react";
-import { STICKY_COLORS } from "../constants";
-import useBoardStore, {
-  Note,
+import { Trash2 } from "lucide-react";
+import {
+  STICKY_COLORS,
   STICKY_SIZE_COPY_MAP,
   STICKY_SIZE_NUMERIC_MAP,
-  STICKY_SIZES,
-  StickySize,
-} from "../BoardStore";
+} from "../constants";
+import useBoardStore, { STICKY_SIZES } from "../BoardStore";
 import { Button, Tooltip } from "@mui/material";
 
 interface StickyMenuProps {
