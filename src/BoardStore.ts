@@ -66,6 +66,11 @@ interface BoardSettings {
   createNewOnCanvasClick: boolean;
 }
 
+interface Point {
+  x: number;
+  y: number;
+}
+
 const DEFAULT_SETTINGS: BoardSettings = {
   confirmDeletes: true,
   defaultStickyColor: STICKY_COLORS[0],
@@ -82,6 +87,7 @@ interface BoardState {
   activeConnection: ActiveConnection | null;
   settings: BoardSettings;
   manifestoOpen: boolean;
+  currentPan: Point;
 
   // global UI actions
   openManifesto: () => void;
@@ -106,6 +112,9 @@ interface BoardState {
   // View Actions
   setZoom: (zoom: number) => void;
   clearBoard: () => void;
+
+  // Movement actions
+  setPan: (newPan: Point) => void;
 
   // Persistence Actions
   saveBoard: () => void;
@@ -227,6 +236,7 @@ const useBoardStore = create<BoardState>((set, get) => ({
   activeConnection: null,
   settings: initSettings,
   manifestoOpen: false,
+  currentPan: { x: 0, y: 0 },
 
   openManifesto: () => set((state) => ({ ...state, manifestoOpen: true })),
   closeManifesto: () => set((state) => ({ ...state, manifestoOpen: false })),
@@ -414,6 +424,11 @@ const useBoardStore = create<BoardState>((set, get) => ({
       connections: [],
       activeConnection: null,
     }));
+  },
+
+  // Movement Actions
+  setPan(newPan) {
+    set({ currentPan: newPan });
   },
 
   // Persistence Actions

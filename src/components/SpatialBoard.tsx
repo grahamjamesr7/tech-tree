@@ -39,16 +39,15 @@ const SpatialBoardV2: React.FC = () => {
     activeConnection,
     settings: boardSettings,
     manifestoOpen,
+    currentPan,
+    setPan,
   } = useBoardStore();
-
-  // Add new state at the top with other state declarations
-  const [boardPosition, setBoardPosition] = useState({ x: 0, y: 0 });
 
   const handleCanvasClick = (e: React.MouseEvent<HTMLDivElement>) => {
     if (activeConnection && boardSettings.createNewOnCanvasClick) {
       const rect = e.currentTarget.getBoundingClientRect();
-      let x = (e.clientX - rect.left - boardPosition.x) / zoom;
-      let y = (e.clientY - rect.top - boardPosition.y) / zoom;
+      let x = (e.clientX - rect.left - currentPan.x) / zoom;
+      let y = (e.clientY - rect.top - currentPan.y) / zoom;
 
       // Add edge buffer checks
       const edgeBuffer = 96;
@@ -83,15 +82,15 @@ const SpatialBoardV2: React.FC = () => {
 
       // Calculate position adjustment to keep cursor in same spot
       const scaleChange = newZoom - zoom;
-      const moveX = (cursorX - boardPosition.x) * (scaleChange / zoom);
-      const moveY = (cursorY - boardPosition.y) * (scaleChange / zoom);
+      const moveX = (cursorX - currentPan.x) * (scaleChange / zoom);
+      const moveY = (cursorY - currentPan.y) * (scaleChange / zoom);
 
       // Update state
       setZoom(newZoom);
-      setBoardPosition((prev) => ({
-        x: prev.x - moveX,
-        y: prev.y - moveY,
-      }));
+      setPan({
+        x: currentPan.x - moveX,
+        y: currentPan.y - moveY,
+      });
     }
   };
 
@@ -120,42 +119,72 @@ const SpatialBoardV2: React.FC = () => {
   }, [activeConnection]);
 
   useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      const panAmount = 50; // pixels to move per keypress
+    const pressedKeys = new Set<string>();
+    let animationFrameId: number | null = null;
 
-      switch (e.key) {
-        case "ArrowLeft":
-          setBoardPosition((prev) => ({ ...prev, x: prev.x + panAmount }));
-          break;
-        case "ArrowRight":
-          setBoardPosition((prev) => ({ ...prev, x: prev.x - panAmount }));
-          break;
-        case "ArrowUp":
-          setBoardPosition((prev) => ({ ...prev, y: prev.y + panAmount }));
-          break;
-        case "ArrowDown":
-          setBoardPosition((prev) => ({ ...prev, y: prev.y - panAmount }));
-          break;
-        case "+":
-          if (e.ctrlKey) {
-            e.preventDefault();
-            const newZoom = Math.min(zoom * 1.1, MAX_ZOOM);
-            setZoom(newZoom);
+    const updatePan = () => {
+      const panAmount = 15 * (1 / zoom); // Reduced amount since this runs every frame
+      let dx = 0;
+      let dy = 0;
+
+      if (pressedKeys.has("ArrowLeft")) dx += panAmount;
+      if (pressedKeys.has("ArrowRight")) dx -= panAmount;
+      if (pressedKeys.has("ArrowUp")) dy += panAmount;
+      if (pressedKeys.has("ArrowDown")) dy -= panAmount;
+
+      if (dx !== 0 || dy !== 0) {
+        setPan({
+          x: currentPan.x + dx,
+          y: currentPan.y + dy,
+        });
+        animationFrameId = requestAnimationFrame(updatePan);
+      }
+    };
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key.startsWith("Arrow")) {
+        e.preventDefault(); // Prevent page scrolling
+        if (!pressedKeys.has(e.key)) {
+          pressedKeys.add(e.key);
+          if (animationFrameId === null) {
+            animationFrameId = requestAnimationFrame(updatePan);
           }
-          break;
-        case "-":
-          if (e.ctrlKey) {
+        }
+      } else if (e.ctrlKey) {
+        switch (e.key) {
+          case "+":
             e.preventDefault();
-            const newZoom = Math.min(zoom * 0.9, MIN_ZOOM);
-            setZoom(Math.max(newZoom));
-          }
-          break;
+            setZoom(Math.min(zoom * 1.1, MAX_ZOOM));
+            break;
+          case "-":
+            e.preventDefault();
+            setZoom(Math.max(zoom * 0.9, MIN_ZOOM));
+            break;
+        }
+      }
+    };
+
+    const handleKeyUp = (e: KeyboardEvent) => {
+      if (e.key.startsWith("Arrow")) {
+        pressedKeys.delete(e.key);
+        if (pressedKeys.size === 0 && animationFrameId !== null) {
+          cancelAnimationFrame(animationFrameId);
+          animationFrameId = null;
+        }
       }
     };
 
     window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, []);
+    window.addEventListener("keyup", handleKeyUp);
+
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+      window.removeEventListener("keyup", handleKeyUp);
+      if (animationFrameId !== null) {
+        cancelAnimationFrame(animationFrameId);
+      }
+    };
+  });
 
   return (
     <div
@@ -178,7 +207,7 @@ const SpatialBoardV2: React.FC = () => {
       <div
         className="absolute inset-0"
         style={{
-          transform: `translate(${boardPosition.x}px, ${boardPosition.y}px) scale(${zoom})`,
+          transform: `translate(${currentPan.x}px, ${currentPan.y}px) scale(${zoom})`,
           transformOrigin: "0 0",
         }}
       >
