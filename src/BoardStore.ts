@@ -66,7 +66,7 @@ interface BoardSettings {
   createNewOnCanvasClick: boolean;
 }
 
-interface Point {
+export interface Point {
   x: number;
   y: number;
 }

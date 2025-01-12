@@ -8,6 +8,8 @@ import GlobalTimeline from "./GlobalTimeline";
 import styled from "styled-components";
 import ManifestoContainer from "./ManifestoContainer";
 import { getOppositeSide } from "../utils";
+import { usePanning } from "../hooks/usePanning";
+import { useZoom } from "../hooks/useZoom";
 
 const GridBackground = styled.div<{ zoom: number }>`
   position: absolute;
@@ -33,15 +35,16 @@ const SpatialBoardV2: React.FC = () => {
     connections,
     zoom,
     addNote,
-    setZoom,
     endConnection,
     cancelConnection,
     activeConnection,
     settings: boardSettings,
     manifestoOpen,
     currentPan,
-    setPan,
   } = useBoardStore();
+
+  usePanning();
+  const { handleWheel } = useZoom();
 
   const handleCanvasClick = (e: React.MouseEvent<HTMLDivElement>) => {
     if (activeConnection && boardSettings.createNewOnCanvasClick) {
@@ -64,33 +67,6 @@ const SpatialBoardV2: React.FC = () => {
       endConnection(newId, getOppositeSide(activeConnection.fromSide));
     } else if (activeConnection) {
       cancelConnection();
-    }
-  };
-
-  const handleWheel = (e: React.WheelEvent) => {
-    if (e.ctrlKey) {
-      e.preventDefault();
-
-      // Get cursor position relative to board
-      const rect = e.currentTarget.getBoundingClientRect();
-      const cursorX = e.clientX - rect.left;
-      const cursorY = e.clientY - rect.top;
-
-      // Calculate new zoom
-      const delta = e.deltaY > 0 ? 0.9 : 1.1;
-      const newZoom = Math.min(Math.max(zoom * delta, MIN_ZOOM), MAX_ZOOM);
-
-      // Calculate position adjustment to keep cursor in same spot
-      const scaleChange = newZoom - zoom;
-      const moveX = (cursorX - currentPan.x) * (scaleChange / zoom);
-      const moveY = (cursorY - currentPan.y) * (scaleChange / zoom);
-
-      // Update state
-      setZoom(newZoom);
-      setPan({
-        x: currentPan.x - moveX,
-        y: currentPan.y - moveY,
-      });
     }
   };
 
@@ -117,74 +93,6 @@ const SpatialBoardV2: React.FC = () => {
       };
     }
   }, [activeConnection]);
-
-  useEffect(() => {
-    const pressedKeys = new Set<string>();
-    let animationFrameId: number | null = null;
-
-    const updatePan = () => {
-      const panAmount = 15 * (1 / zoom); // Reduced amount since this runs every frame
-      let dx = 0;
-      let dy = 0;
-
-      if (pressedKeys.has("ArrowLeft")) dx += panAmount;
-      if (pressedKeys.has("ArrowRight")) dx -= panAmount;
-      if (pressedKeys.has("ArrowUp")) dy += panAmount;
-      if (pressedKeys.has("ArrowDown")) dy -= panAmount;
-
-      if (dx !== 0 || dy !== 0) {
-        setPan({
-          x: currentPan.x + dx,
-          y: currentPan.y + dy,
-        });
-        animationFrameId = requestAnimationFrame(updatePan);
-      }
-    };
-
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key.startsWith("Arrow")) {
-        e.preventDefault(); // Prevent page scrolling
-        if (!pressedKeys.has(e.key)) {
-          pressedKeys.add(e.key);
-          if (animationFrameId === null) {
-            animationFrameId = requestAnimationFrame(updatePan);
-          }
-        }
-      } else if (e.ctrlKey) {
-        switch (e.key) {
-          case "+":
-            e.preventDefault();
-            setZoom(Math.min(zoom * 1.1, MAX_ZOOM));
-            break;
-          case "-":
-            e.preventDefault();
-            setZoom(Math.max(zoom * 0.9, MIN_ZOOM));
-            break;
-        }
-      }
-    };
-
-    const handleKeyUp = (e: KeyboardEvent) => {
-      if (e.key.startsWith("Arrow")) {
-        pressedKeys.delete(e.key);
-        if (pressedKeys.size === 0 && animationFrameId !== null) {
-          cancelAnimationFrame(animationFrameId);
-          animationFrameId = null;
-        }
-      }
-    };
-
-    window.addEventListener("keydown", handleKeyDown);
-    window.addEventListener("keyup", handleKeyUp);
-
-    return () => {
-      window.removeEventListener("keydown", handleKeyDown);
-      window.removeEventListener("keyup", handleKeyUp);
-      if (animationFrameId !== null) {
-        cancelAnimationFrame(animationFrameId);
-      }
-    };
-  });
 
   return (
     <div
