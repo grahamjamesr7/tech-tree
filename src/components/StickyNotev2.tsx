@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
 import useBoardStore, { Side } from "../BoardStore";
 import { Move } from "lucide-react";
-import StickyMenu from "./StickyMenu";
 import { adjustHexColor } from "../utils";
 import { STICKY_SIZE_COPY_MAP, STICKY_SIZE_NUMERIC_MAP } from "../constants";
+import EditStickyMenu from "./EditStickyMenu";
 
 interface StickyNoteProps {
   id: number;
@@ -20,9 +20,11 @@ const StickyNoteV2: React.FC<StickyNoteProps> = ({ id, x, y }) => {
     updateNote,
     notes,
     settings,
+    editMode,
   } = useBoardStore();
 
   const [isHovered, setIsHovered] = useState(false);
+  const [showConn, setShowConn] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
   const [offset, setOffset] = useState({ x: 0, y: 0 });
   const [isEditing, setIsEditing] = useState(false);
@@ -41,6 +43,11 @@ const StickyNoteV2: React.FC<StickyNoteProps> = ({ id, x, y }) => {
         <div className="text-red-500 mt-2">Note not found</div>
       </div>
     );
+  }
+
+  function changeHover(hover: boolean) {
+    setIsHovered(hover);
+    setShowConn(hover && editMode == "add");
   }
 
   useEffect(() => {
@@ -117,8 +124,8 @@ const StickyNoteV2: React.FC<StickyNoteProps> = ({ id, x, y }) => {
       } w-48 h-48 p-4 shadow-lg rounded-sm font-lato flex flex-col
       ${activeConnection?.fromId == id ? "ring-2 ring-blue-500" : ""}
       ${isDragging ? "cursor-grabbing" : ""}`}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
+      onMouseEnter={() => changeHover(true)}
+      onMouseLeave={() => changeHover(false)}
       style={{
         left: thisNote.x,
         top: thisNote.y,
@@ -130,31 +137,31 @@ const StickyNoteV2: React.FC<StickyNoteProps> = ({ id, x, y }) => {
     >
       <div
         className={`connection-handle absolute top-0 left-1/2 w-3 h-3 bg-blue-500 rounded-full cursor-pointer transform -translate-x-1/2 -translate-y-1/2 transition-opacity duration-200 ${
-          isHovered ? "opacity-100" : "opacity-0"
+          showConn ? "opacity-100" : "opacity-0"
         }`}
         onMouseDown={(e) => connectorClicked(e, "top")}
       />
       <div
         className={`connection-handle absolute top-1/2 right-0 w-3 h-3 bg-blue-500 rounded-full cursor-pointer transform translate-x-1/2 -translate-y-1/2 transition-opacity duration-200 ${
-          isHovered ? "opacity-100" : "opacity-0"
+          showConn ? "opacity-100" : "opacity-0"
         }`}
         onMouseDown={(e) => connectorClicked(e, "right")}
       />
       <div
         className={`connection-handle absolute top-1/2 left-0 w-3 h-3 bg-blue-500 rounded-full cursor-pointer transform -translate-x-1/2 -translate-y-1/2 transition-opacity duration-200 ${
-          isHovered ? "opacity-100" : "opacity-0"
+          showConn ? "opacity-100" : "opacity-0"
         }`}
         onMouseDown={(e) => connectorClicked(e, "left")}
       />
       <div
         className={`connection-handle absolute bottom-0 left-1/2 w-3 h-3 bg-blue-500 rounded-full cursor-pointer transform -translate-x-1/2 translate-y-1/2 transition-opacity duration-200 ${
-          isHovered ? "opacity-100" : "opacity-0"
+          showConn ? "opacity-100" : "opacity-0"
         }`}
         onMouseDown={(e) => connectorClicked(e, "bottom")}
       />
       <div
         className={`absolute -top-10 left-0 w-full transition-opacity ${
-          isHovered ? "opacity-100" : "opacity-0"
+          showConn ? "opacity-100" : "opacity-0"
         }`}
       >
         <div className="flex justify-between px-2">
@@ -167,7 +174,8 @@ const StickyNoteV2: React.FC<StickyNoteProps> = ({ id, x, y }) => {
             <Move size={16} />
           </button>
         </div>
-        <StickyMenu id={id} isVisible={isHovered} />
+
+        <EditStickyMenu id={id} isVisible={isHovered} />
       </div>
       <textarea
         className="w-full bg-transparent resize-none border-none focus:outline-none font-lato text-black font-bold text-lg mb-2"
@@ -178,6 +186,7 @@ const StickyNoteV2: React.FC<StickyNoteProps> = ({ id, x, y }) => {
           lineHeight: "1.5rem",
           overflow: "hidden",
         }}
+        disabled={editMode != "add"}
         placeholder="Title..."
         onClick={(e) => {
           e.stopPropagation();
@@ -205,6 +214,7 @@ const StickyNoteV2: React.FC<StickyNoteProps> = ({ id, x, y }) => {
         placeholder="Description..."
         onClick={(e) => e.stopPropagation()}
         value={thisNote.content.summary}
+        disabled={editMode != "add"}
         onChange={(e) => {
           updateNote({ id, content: { summary: e.target.value } });
           setIsEditing(true);
