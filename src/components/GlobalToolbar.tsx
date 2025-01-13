@@ -22,7 +22,7 @@ export default function GlobalToolbar() {
 
   const modes: Mode[] = [
     {
-      tooltip: "(E) - Execute/Worker Mode",
+      tooltip: "(E) - Implementer/Worker Mode",
       icon: <Keyboard fontSize={24} />,
       mode: "execute",
     },
@@ -34,9 +34,30 @@ export default function GlobalToolbar() {
     {
       tooltip: "(S) - Select/Arrange Mode",
       icon: <BoxSelectIcon fontSize={24} />,
-      mode: "select",
+      mode: "arrange",
     },
   ];
+
+  React.useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (!e.ctrlKey) return;
+
+      switch (e.key.toLowerCase()) {
+        case "e":
+          changeMode("execute");
+          break;
+        case "a":
+          changeMode("add");
+          break;
+        case "s":
+          changeMode("arrange");
+          break;
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [changeMode]);
 
   // TODO: add keyboard shortcuts
 

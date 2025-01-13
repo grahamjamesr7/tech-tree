@@ -18,6 +18,8 @@ const StickyNoteV2: React.FC<StickyNoteProps> = ({ id, x, y }) => {
     cancelConnection,
     endConnection,
     updateNote,
+    isEditing,
+    changeIsEditing,
     notes,
     settings,
     editMode,
@@ -27,7 +29,6 @@ const StickyNoteV2: React.FC<StickyNoteProps> = ({ id, x, y }) => {
   const [showConn, setShowConn] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
   const [offset, setOffset] = useState({ x: 0, y: 0 });
-  const [isEditing, setIsEditing] = useState(false);
 
   const thisNote = notes.find((i) => i.id == id);
 
@@ -53,7 +54,7 @@ const StickyNoteV2: React.FC<StickyNoteProps> = ({ id, x, y }) => {
   useEffect(() => {
     if (isEditing) {
       const timer = setTimeout(() => {
-        setIsEditing(false);
+        changeIsEditing(false);
       }, 1200);
       return () => clearTimeout(timer);
     }
@@ -175,7 +176,7 @@ const StickyNoteV2: React.FC<StickyNoteProps> = ({ id, x, y }) => {
           </button>
         </div>
 
-        <EditStickyMenu id={id} isVisible={isHovered} />
+        {editMode == "add" && <EditStickyMenu id={id} isVisible={isHovered} />}
       </div>
       <textarea
         className="w-full bg-transparent resize-none border-none focus:outline-none font-lato text-black font-bold text-lg mb-2"
@@ -190,7 +191,7 @@ const StickyNoteV2: React.FC<StickyNoteProps> = ({ id, x, y }) => {
         placeholder="Title..."
         onClick={(e) => {
           e.stopPropagation();
-          setIsEditing(true);
+          changeIsEditing(true);
         }}
         value={thisNote.title}
         ref={(textarea) => {
@@ -202,7 +203,7 @@ const StickyNoteV2: React.FC<StickyNoteProps> = ({ id, x, y }) => {
         }}
         onChange={(e) => {
           updateNote({ id, title: e.target.value });
-          setIsEditing(true);
+          changeIsEditing(true);
           // Automatically adjust height based on content
           e.target.style.height = "1.5rem";
           const scrollHeight = Math.min(e.target.scrollHeight, 48);
@@ -217,7 +218,7 @@ const StickyNoteV2: React.FC<StickyNoteProps> = ({ id, x, y }) => {
         disabled={editMode != "add"}
         onChange={(e) => {
           updateNote({ id, content: { summary: e.target.value } });
-          setIsEditing(true);
+          changeIsEditing(true);
         }}
       />
       {thisNote.size && !isEditing && (

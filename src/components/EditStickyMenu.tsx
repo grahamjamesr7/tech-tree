@@ -48,10 +48,6 @@ const EditStickyMenu: React.FC<StickyMenuProps> = ({ isVisible, id }) => {
       className={`absolute -left-20 top-0 ml-5 transition-opacity duration-200 ${
         isVisible ? "opacity-100" : "opacity-0"
       }`}
-      // For some reason this works instead of the tailwind one
-      style={{
-        pointerEvents: isVisible ? "auto" : "none",
-      }}
     >
       <div className="bg-white rounded-lg shadow-lg p-2 flex flex-col gap-2 items-center">
         <Tooltip title="Delete Note" arrow placement="left">

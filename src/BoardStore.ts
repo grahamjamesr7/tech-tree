@@ -21,7 +21,7 @@ export const STICKY_SIZES = {
 
 export type StickySize = (typeof STICKY_SIZES)[keyof typeof STICKY_SIZES];
 
-export type EditMode = "add" | "select" | "execute";
+export type EditMode = "add" | "arrange" | "execute";
 
 interface StickyContent {
   context?: string;
@@ -97,11 +97,13 @@ interface BoardState {
   manifestoOpen: boolean;
   currentPan: Point;
   editMode: EditMode;
+  isEditing: boolean;
 
   // global UI actions
   openManifesto: () => void;
   closeManifesto: () => void;
   changeMode: (newMode: EditMode) => void;
+  changeIsEditing: (newEditing: boolean) => void;
 
   // Note Actions
   addNote: (x: number, y: number) => number;
@@ -152,9 +154,12 @@ const useBoardStore = create<BoardState>((set, get) => ({
   manifestoOpen: false,
   currentPan: { x: 0, y: 0 },
   editMode: "add",
+  isEditing: false,
 
   openManifesto: () => set((state) => ({ ...state, manifestoOpen: true })),
   closeManifesto: () => set((state) => ({ ...state, manifestoOpen: false })),
+  changeIsEditing: (newEditing) =>
+    set((state) => ({ ...state, isEditing: newEditing })),
 
   // Mode Actions
   changeMode: (newMode) => set((state) => ({ ...state, editMode: newMode })),

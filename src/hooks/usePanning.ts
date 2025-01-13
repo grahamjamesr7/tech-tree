@@ -1,12 +1,59 @@
-import { useEffect } from "react";
+import { useEffect, useCallback, useRef } from "react";
 import useBoardStore from "../BoardStore";
 
+interface DragState {
+  isDragging: boolean;
+  lastX: number;
+  lastY: number;
+}
+
 export function usePanning() {
-  const { currentPan, setPan, zoom, setZoom } = useBoardStore();
+  const { currentPan, setPan, zoom, setZoom, editMode } = useBoardStore();
+  const dragState = useRef<DragState>({
+    isDragging: false,
+    lastX: 0,
+    lastY: 0,
+  });
+
   const MIN_ZOOM = 0.1;
   const MAX_ZOOM = 1.0;
   const PAN_SPEED = 15;
 
+  // Handle mouse-based panning
+  const handleMouseDown = useCallback(
+    (e: React.MouseEvent<HTMLDivElement>) => {
+      if (editMode !== "arrange" && e.button === 0) {
+        dragState.current.isDragging = true;
+        dragState.current.lastX = e.clientX;
+        dragState.current.lastY = e.clientY;
+      }
+    },
+    [editMode]
+  );
+
+  const handleMouseMove = useCallback(
+    (e: React.MouseEvent<HTMLDivElement>) => {
+      if (dragState.current.isDragging) {
+        const dx = e.clientX - dragState.current.lastX;
+        const dy = e.clientY - dragState.current.lastY;
+
+        setPan({
+          x: currentPan.x + dx,
+          y: currentPan.y + dy,
+        });
+
+        dragState.current.lastX = e.clientX;
+        dragState.current.lastY = e.clientY;
+      }
+    },
+    [currentPan, setPan]
+  );
+
+  const handleMouseUp = useCallback(() => {
+    dragState.current.isDragging = false;
+  }, []);
+
+  // Keyboard-based panning
   useEffect(() => {
     const pressedKeys = new Set<string>();
     let animationFrameId: number | null = null;
@@ -73,4 +120,10 @@ export function usePanning() {
       }
     };
   }, [currentPan, setPan, zoom, setZoom]);
+
+  return {
+    handleMouseDown,
+    handleMouseMove,
+    handleMouseUp,
+  };
 }

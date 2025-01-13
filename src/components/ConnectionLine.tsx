@@ -93,7 +93,7 @@ export const RadialMenu: React.FC<RadialMenuProps> = ({
 };
 
 const ConnectionLine: React.FC<ConnectionLineProps> = ({ id }) => {
-  const { notes, connections, deleteConnection, updateConnection } =
+  const { notes, connections, deleteConnection, updateConnection, editMode } =
     useBoardStore();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
@@ -197,11 +197,15 @@ const ConnectionLine: React.FC<ConnectionLineProps> = ({ id }) => {
         stroke="transparent"
         strokeWidth="20"
         fill="none"
-        style={{ pointerEvents: "stroke", cursor: "pointer" }}
-        className="cursor-pointer"
+        style={{
+          pointerEvents: "stroke",
+          cursor: editMode == "add" ? "pointer" : "default",
+        }}
         onClick={(e) => {
-          e.stopPropagation();
-          setIsMenuOpen(!isMenuOpen);
+          if (editMode == "add") {
+            e.stopPropagation();
+            setIsMenuOpen(!isMenuOpen);
+          }
         }}
       />
 

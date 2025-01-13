@@ -43,7 +43,7 @@ const SpatialBoardV2: React.FC = () => {
     currentPan,
   } = useBoardStore();
 
-  usePanning();
+  const { handleMouseDown, handleMouseMove, handleMouseUp } = usePanning();
   const { handleWheel } = useZoom();
 
   const handleCanvasClick = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -99,6 +99,10 @@ const SpatialBoardV2: React.FC = () => {
       className="relative w-full h-screen bg-white overflow-hidden font-lato"
       onClick={handleCanvasClick}
       onWheel={handleWheel}
+      onMouseUp={handleMouseUp}
+      onMouseMove={handleMouseMove}
+      onMouseDown={handleMouseDown}
+      onMouseLeave={handleMouseUp}
     >
       <SettingsMenu
         isOpen={settingsOpen}
