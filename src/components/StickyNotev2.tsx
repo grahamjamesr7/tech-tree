@@ -123,7 +123,7 @@ const StickyNoteV2: React.FC<StickyNoteProps> = ({ id, x, y }) => {
     <div
       className={`absolute ${
         thisNote.color.bgClass
-      } w-48 h-48 p-4 shadow-lg rounded-sm font-lato flex flex-col
+      } w-48 h-48 p-4 shadow-lg rounded-sm font-lato flex flex-col sticky-note
       ${activeConnection?.fromId == id ? "ring-2 ring-blue-500" : ""}
       ${isDragging ? "cursor-grabbing" : ""}`}
       onMouseEnter={() => changeHover(true)}

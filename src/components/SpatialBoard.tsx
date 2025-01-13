@@ -97,6 +97,7 @@ const SpatialBoardV2: React.FC = () => {
 
   return (
     <div
+      id="canvas-background"
       className="relative w-full h-screen bg-white overflow-hidden font-lato"
       onClick={handleCanvasClick}
       onWheel={handleWheel}

@@ -22,7 +22,16 @@ export function usePanning() {
   // Handle mouse-based panning
   const handleMouseDown = useCallback(
     (e: React.MouseEvent<HTMLDivElement>) => {
-      if (editMode !== "arrange" && e.button === 0) {
+      const backgroundElement = document.getElementById("canvas-background");
+      const clickedElement = e.target as HTMLElement;
+      const isClickable = clickedElement.closest(
+        ".sticky-note, button, .connection-handle"
+      );
+      const isBackgroundClick =
+        backgroundElement === clickedElement ||
+        (backgroundElement?.contains(clickedElement) && !isClickable);
+
+      if (editMode !== "arrange" && e.button === 0 && isBackgroundClick) {
         dragState.current.isDragging = true;
         dragState.current.lastX = e.clientX;
         dragState.current.lastY = e.clientY;
