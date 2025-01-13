@@ -150,3 +150,5 @@ export const STICKY_SIZE_NUMERIC_MAP: Record<StickySize, number> = {
   "extra-large": 13,
   "too-big": 21,
 };
+
+export const AUTOSAVE_MILLIS = 30000; // 30s

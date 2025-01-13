@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import ReactDOM from "react-dom";
-import useBoardStore from "../BoardStore";
-import { STICKY_COLORS } from "../constants";
+import useBoardStore from "../../BoardStore";
+import { STICKY_COLORS } from "../../constants";
 import {
   Paper,
   Typography,
@@ -22,7 +22,7 @@ import CloseIcon from "@mui/icons-material/Close";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import GridOnIcon from "@mui/icons-material/GridOn";
 import PaletteIcon from "@mui/icons-material/Palette";
-import { Numbers } from "@mui/icons-material";
+import { Numbers, Rectangle, Save } from "@mui/icons-material";
 
 interface SettingsMenuProps {
   isOpen: boolean;
@@ -168,6 +168,26 @@ const SettingsMenu: React.FC<SettingsMenuProps> = ({ isOpen, onClose }) => {
           <FormControlLabel
             control={
               <Checkbox
+                checked={localSettings.enableAutoSave}
+                onChange={(e) =>
+                  updateSettings({ enableAutoSave: e.target.checked })
+                }
+                color="primary"
+              />
+            }
+            label={
+              <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                <Save
+                  sx={{ color: theme.palette.text.secondary }}
+                  fontSize="small"
+                />
+                <Typography variant="body2">Enable Autosave</Typography>
+              </Box>
+            }
+          />
+          <FormControlLabel
+            control={
+              <Checkbox
                 checked={localSettings.createNewOnCanvasClick}
                 onChange={(e) =>
                   updateSettings({ createNewOnCanvasClick: e.target.checked })
@@ -177,7 +197,7 @@ const SettingsMenu: React.FC<SettingsMenuProps> = ({ isOpen, onClose }) => {
             }
             label={
               <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                <Numbers
+                <Rectangle
                   sx={{ color: theme.palette.text.secondary }}
                   fontSize="small"
                 />

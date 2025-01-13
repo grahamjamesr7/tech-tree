@@ -1,15 +1,16 @@
 import React, { useEffect, useState } from "react";
-import useBoardStore, { getConnectionPoint } from "../BoardStore";
+import useBoardStore from "../BoardStore";
 import ConnectionLine from "./ConnectionLine";
 import StickyNoteV2 from "./StickyNotev2";
-import SettingsMenu from "./SettingsMenu";
-import GlobalMenu from "./GlobalMenu";
-import GlobalTimeline from "./GlobalTimeline";
+import SettingsMenu from "./controls/SettingsMenu";
+import GlobalTimeline from "./decorations/GlobalTimeline";
 import styled from "styled-components";
 import ManifestoContainer from "./ManifestoContainer";
-import { getOppositeSide } from "../utils";
+import { getConnectionPoint, getOppositeSide } from "../utils";
 import { usePanning } from "../hooks/usePanning";
 import { useZoom } from "../hooks/useZoom";
+import GlobalMenu from "./controls/GlobalMenu";
+import Autosaver from "./AutoSaver";
 
 const GridBackground = styled.div<{
   zoom: number;
@@ -24,9 +25,6 @@ const GridBackground = styled.div<{
   background-position: ${({ pan }) => `${pan.x}px ${pan.y}px`};
   pointer-events: none;
 `;
-
-const MIN_ZOOM = 0.1;
-const MAX_ZOOM = 1.0;
 
 const SpatialBoardV2: React.FC = () => {
   const [settingsOpen, setSettingsOpen] = useState(false);
@@ -111,6 +109,7 @@ const SpatialBoardV2: React.FC = () => {
         onClose={() => setSettingsOpen(false)}
       />
       <GlobalMenu setSettingsOpen={setSettingsOpen} />
+      <Autosaver />
       <GlobalTimeline />
       {manifestoOpen && <ManifestoContainer />}
 

@@ -1,15 +1,8 @@
-import {
-  Button,
-  ButtonGroup,
-  darken,
-  IconButton,
-  Paper,
-  Tooltip,
-} from "@mui/material";
+import { ButtonGroup, darken, IconButton, Paper, Tooltip } from "@mui/material";
 import { BoxSelectIcon, Keyboard, Plus } from "lucide-react";
 import React, { ReactNode } from "react";
-import useBoardStore, { EditMode } from "../BoardStore";
-import { STICKY_COLORS } from "../constants";
+import useBoardStore, { EditMode } from "../../BoardStore";
+import { STICKY_COLORS } from "../../constants";
 
 interface Mode {
   tooltip: string;
@@ -88,7 +81,7 @@ export default function GlobalToolbar() {
         size="large"
       >
         {modes.map((m) => (
-          <Tooltip title={m.tooltip}>
+          <Tooltip title={m.tooltip} key={m.mode}>
             <IconButton
               sx={{
                 borderRadius: "1rem",

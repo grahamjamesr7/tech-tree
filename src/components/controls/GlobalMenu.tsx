@@ -8,7 +8,7 @@ import {
   Check,
   Newspaper,
 } from "lucide-react";
-import useBoardStore from "../BoardStore";
+import useBoardStore from "../../BoardStore";
 
 interface GlobalMenuProps {
   setSettingsOpen: (open: boolean) => void;

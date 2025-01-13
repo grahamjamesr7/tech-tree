@@ -1,4 +1,4 @@
-import { Side } from "./BoardStore";
+import { Note, Side } from "./BoardStore";
 
 /**
  * Adjusts a hex color by a given percentage
@@ -39,3 +39,20 @@ export function getOppositeSide(side: Side): Side {
       return "left";
   }
 }
+
+// Helper function to get connection point coordinates
+export const getConnectionPoint = (
+  note: Note,
+  side: Side
+): { x: number; y: number } => {
+  switch (side) {
+    case "top":
+      return { x: note.x, y: note.y - 96 };
+    case "right":
+      return { x: note.x + 96, y: note.y };
+    case "bottom":
+      return { x: note.x, y: note.y + 96 };
+    case "left":
+      return { x: note.x - 96, y: note.y };
+  }
+};

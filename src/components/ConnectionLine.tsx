@@ -1,9 +1,7 @@
 import React, { useState } from "react";
 import { Trash2, X } from "lucide-react";
-import useBoardStore, {
-  ConnectionStyle,
-  getConnectionPoint,
-} from "../BoardStore";
+import useBoardStore, { ConnectionStyle } from "../BoardStore";
+import { getConnectionPoint } from "../utils";
 
 interface ConnectionLineProps {
   id: number;

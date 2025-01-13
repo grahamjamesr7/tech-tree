@@ -72,6 +72,8 @@ interface BoardSettings {
   showGrid: boolean;
   showPoints: boolean;
   createNewOnCanvasClick: boolean;
+  enableAutoSave: boolean;
+  lastSaveTime: number;
 }
 
 export interface Point {
@@ -82,9 +84,11 @@ export interface Point {
 const DEFAULT_SETTINGS: BoardSettings = {
   confirmDeletes: true,
   defaultStickyColor: STICKY_COLORS[0],
-  showGrid: false,
+  showGrid: true,
   showPoints: true,
   createNewOnCanvasClick: true,
+  enableAutoSave: true,
+  lastSaveTime: Date.now(),
 };
 
 interface BoardState {
@@ -119,7 +123,7 @@ interface BoardState {
   updateConnection: (id: number, updates: Partial<Connection>) => void;
 
   // Settings actions
-  changeSettings: (newSettings: BoardSettings) => void;
+  changeSettings: (newSettings: Partial<BoardSettings>) => void;
 
   // View Actions
   setZoom: (zoom: number) => void;
@@ -129,7 +133,7 @@ interface BoardState {
   setPan: (newPan: Point) => void;
 
   // Persistence Actions
-  saveBoard: () => void;
+  saveBoard: () => number | undefined;
   loadBoard: () => void;
 }
 
@@ -321,21 +325,19 @@ const useBoardStore = create<BoardState>((set, get) => ({
       ),
     })),
 
-  changeSettings: (newSettings) => {
+  changeSettings: (newSettings: Partial<BoardSettings>) => {
     set((state) => {
-      const newState = {
-        settings: { ...state.settings, ...newSettings },
-      };
+      const updatedSettings = { ...state.settings, ...newSettings };
       // Save settings to localStorage
       try {
         localStorage.setItem(
           "tech-tree-settings",
-          JSON.stringify(newState.settings)
+          JSON.stringify(updatedSettings)
         );
       } catch (err) {
         console.error("Failed to save settings:", err);
       }
-      return newState;
+      return { settings: updatedSettings };
     });
   },
   // View Actions
@@ -357,16 +359,26 @@ const useBoardStore = create<BoardState>((set, get) => ({
   // Persistence Actions
   saveBoard: () => {
     const state = get();
+    const saveTime = Date.now();
     const saveData = {
-      id: Date.now(),
+      id: saveTime,
       notes: state.notes,
       connections: state.connections,
     };
     try {
       localStorage.setItem("boardState", JSON.stringify(saveData));
+      set({ settings: { ...state.settings, lastSaveTime: saveTime } });
+      if (localStorage.getItem("tech-tree-settings") === undefined) {
+        localStorage.setItem(
+          "tech-tree-settings",
+          JSON.stringify(state.settings)
+        );
+      }
     } catch (err) {
       console.error("Failed to save board state:", err);
+      return undefined;
     }
+    return saveTime;
   },
   loadBoard: () => {
     try {
@@ -383,23 +395,6 @@ const useBoardStore = create<BoardState>((set, get) => ({
     }
   },
 }));
-
-// Helper function to get connection point coordinates
-export const getConnectionPoint = (
-  note: Note,
-  side: Side
-): { x: number; y: number } => {
-  switch (side) {
-    case "top":
-      return { x: note.x, y: note.y - 96 };
-    case "right":
-      return { x: note.x + 96, y: note.y };
-    case "bottom":
-      return { x: note.x, y: note.y + 96 };
-    case "left":
-      return { x: note.x - 96, y: note.y };
-  }
-};
 
 export type { Note, Connection, Side, ActiveConnection };
 export default useBoardStore;
