@@ -23,64 +23,49 @@ const StickyNoteV2: React.FC<StickyNoteProps> = ({ id, x, y }) => {
     notes,
     settings,
     editMode,
+    currentPan,
+    zoom,
   } = useBoardStore();
 
   const [isHovered, setIsHovered] = useState(false);
   const [showConn, setShowConn] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
   const [offset, setOffset] = useState({ x: 0, y: 0 });
-
-  const thisNote = notes.find((i) => i.id == id);
-
-  if (!thisNote) {
-    return (
-      <div className="flex flex-col items-center justify-center">
-        <svg className="w-6 h-6 text-red-500" viewBox="0 0 24 24">
-          <path
-            fill="currentColor"
-            d="M12 2L1 21h22M12 6l7.53 13H4.47M11 10v4h2v-4m-2 6v2h2v-2"
-          />
-        </svg>
-        <div className="text-red-500 mt-2">Note not found</div>
-      </div>
-    );
-  }
-
-  function changeHover(hover: boolean) {
-    setIsHovered(hover);
-    setShowConn(hover && editMode == "add");
-  }
-
-  useEffect(() => {
-    if (isEditing) {
-      const timer = setTimeout(() => {
-        changeIsEditing(false);
-      }, 1200);
-      return () => clearTimeout(timer);
-    }
-  }, [isEditing]);
+  const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
 
   const handleMouseDown = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
 
-    const rect = (e.target as HTMLElement).getBoundingClientRect();
-    const offsetX = e.clientX - rect.left;
-    const offsetY = e.clientY - rect.top;
-    setOffset({ x: offsetX, y: offsetY });
+    // Calculate offset from the cursor to the note's center
+    const noteX = x;
+    const noteY = y;
+    const cursorX = (e.clientX - currentPan.x) / zoom;
+    const cursorY = (e.clientY - currentPan.y) / zoom;
+
+    setDragOffset({
+      x: noteX - cursorX,
+      y: noteY - cursorY,
+    });
+
     setIsDragging(true);
   };
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
+      if (!isDragging) return;
       e.preventDefault();
       e.stopPropagation();
-      if (!isDragging) return;
 
-      const newX = e.clientX - 2 * offset.x + 96;
-      const newY = e.clientY + 2 * offset.y + 96;
+      // Calculate new position while maintaining the initial grab offset
+      const cursorX = (e.clientX - currentPan.x) / zoom;
+      const cursorY = (e.clientY - currentPan.y) / zoom;
 
-      updateNote({ id, x: newX, y: newY }); // short circuit, we need the connection to move with the sticky
+      updateNote({
+        id,
+        x: cursorX + dragOffset.x,
+        y: cursorY + dragOffset.y,
+      });
     };
 
     const handleMouseUp = (e: MouseEvent) => {
@@ -106,7 +91,23 @@ const StickyNoteV2: React.FC<StickyNoteProps> = ({ id, x, y }) => {
       window.removeEventListener("mousemove", handleMouseMove);
       window.removeEventListener("mouseup", handleMouseUp);
     };
-  }, [isDragging, offset, id, updateNote]);
+  }, [isDragging, offset, id, updateNote, currentPan, zoom]);
+
+  const thisNote = notes.find((i) => i.id == id)!;
+
+  function changeHover(hover: boolean) {
+    setIsHovered(hover);
+    setShowConn(hover && editMode == "add");
+  }
+
+  useEffect(() => {
+    if (isEditing) {
+      const timer = setTimeout(() => {
+        changeIsEditing(false);
+      }, 1200);
+      return () => clearTimeout(timer);
+    }
+  }, [isEditing]);
 
   function connectorClicked(e: React.MouseEvent<HTMLDivElement>, side: Side) {
     e.stopPropagation();
