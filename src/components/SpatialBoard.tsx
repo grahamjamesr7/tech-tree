@@ -11,17 +11,18 @@ import { getOppositeSide } from "../utils";
 import { usePanning } from "../hooks/usePanning";
 import { useZoom } from "../hooks/useZoom";
 
-const GridBackground = styled.div<{ zoom: number }>`
-  position: absolute;
+const GridBackground = styled.div<{
+  zoom: number;
+  pan: { x: number; y: number };
+}>`
+  position: fixed; // Changed from absolute to fixed
   inset: 0;
   opacity: 0.1;
-  background-size: 40px 40px;
+  background-size: ${({ zoom }) => `${40 * zoom}px ${40 * zoom}px`};
   background-image: linear-gradient(to right, #000 1px, transparent 1px),
     linear-gradient(to bottom, #000 1px, transparent 1px);
-  transform: ${({ zoom }) => `scale(${zoom})`};
-  transform-origin: 0 0;
-  width: ${({ zoom }) => `${100 / zoom}%`};
-  height: ${({ zoom }) => `${100 / zoom}%`};
+  background-position: ${({ pan }) => `${pan.x}px ${pan.y}px`};
+  pointer-events: none;
 `;
 
 const MIN_ZOOM = 0.1;
@@ -113,7 +114,9 @@ const SpatialBoardV2: React.FC = () => {
       {manifestoOpen && <ManifestoContainer />}
 
       {/* Grid Background */}
-      {boardSettings.showGrid && <GridBackground zoom={zoom} />}
+      {boardSettings.showGrid && (
+        <GridBackground zoom={zoom} pan={currentPan} />
+      )}
 
       {/* Notes and Connections */}
       <div

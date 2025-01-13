@@ -22,17 +22,17 @@ export default function GlobalToolbar() {
 
   const modes: Mode[] = [
     {
-      tooltip: "(E) - Implementer/Worker Mode",
+      tooltip: "(cmd + E) - Implementer/Worker Mode",
       icon: <Keyboard fontSize={24} />,
       mode: "execute",
     },
     {
-      tooltip: "(A) - Add/Edit Mode",
+      tooltip: "(cmd + A) - Add/Edit Mode",
       icon: <Plus fontSize={24} />,
       mode: "add",
     },
     {
-      tooltip: "(S) - Select/Arrange Mode",
+      tooltip: "(cmd + S) - Select/Arrange Mode",
       icon: <BoxSelectIcon fontSize={24} />,
       mode: "arrange",
     },
@@ -40,16 +40,18 @@ export default function GlobalToolbar() {
 
   React.useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (!e.ctrlKey) return;
+      if (!e.ctrlKey && !e.metaKey) return;
 
       switch (e.key.toLowerCase()) {
         case "e":
           changeMode("execute");
           break;
         case "a":
+          e.preventDefault(); // Prevent select all
           changeMode("add");
           break;
         case "s":
+          e.preventDefault(); // Prevent save dialog
           changeMode("arrange");
           break;
       }
@@ -58,8 +60,6 @@ export default function GlobalToolbar() {
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [changeMode]);
-
-  // TODO: add keyboard shortcuts
 
   return (
     <Paper
