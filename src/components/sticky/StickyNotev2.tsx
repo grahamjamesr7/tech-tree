@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from "react";
-import useBoardStore, { Side } from "../BoardStore";
+import useBoardStore, { Side } from "../../BoardStore";
 import { Move } from "lucide-react";
-import { adjustHexColor } from "../utils";
-import { STICKY_SIZE_COPY_MAP, STICKY_SIZE_NUMERIC_MAP } from "../constants";
+import { adjustHexColor } from "../../utils";
+import { STICKY_SIZE_COPY_MAP, STICKY_SIZE_NUMERIC_MAP } from "../../constants";
 import EditStickyMenu from "./EditStickyMenu";
+import WorkOnStickyMenu from "./WorkOnStickyMenu";
 
 interface StickyNoteProps {
   id: number;
@@ -178,6 +179,9 @@ const StickyNoteV2: React.FC<StickyNoteProps> = ({ id, x, y }) => {
         </div>
 
         {editMode == "add" && <EditStickyMenu id={id} isVisible={isHovered} />}
+        {editMode == "execute" && (
+          <WorkOnStickyMenu noteId={id} isVisible={isHovered} />
+        )}
       </div>
       <textarea
         className="w-full bg-transparent resize-none border-none focus:outline-none font-lato text-black font-bold text-lg mb-2"

@@ -32,6 +32,7 @@ export const BAD_ENDING: Note[] = [
       summary:
         "The only way to make stickies is by splitting them. Split this one to make more.",
     },
+    status: "not-started",
   },
 ];
 
@@ -46,6 +47,7 @@ export const DEFAULT_NOTES: Note[] = [
     y: 256,
     recursive: false,
     color: STICKY_COLORS[0],
+    status: "not-started",
   },
   {
     id: 2,
@@ -58,6 +60,7 @@ export const DEFAULT_NOTES: Note[] = [
     y: 512,
     recursive: false,
     color: STICKY_COLORS[0],
+    status: "not-started",
   },
   {
     id: 3,
@@ -71,6 +74,7 @@ export const DEFAULT_NOTES: Note[] = [
     recursive: false,
     color: STICKY_COLORS[1],
     size: "medium",
+    status: "not-started",
   },
   {
     id: 4,
@@ -83,6 +87,7 @@ export const DEFAULT_NOTES: Note[] = [
     y: 672,
     recursive: false,
     color: STICKY_COLORS[2],
+    status: "not-started",
   },
   // {
   //   id: 4,

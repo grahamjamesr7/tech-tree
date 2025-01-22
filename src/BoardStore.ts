@@ -21,6 +21,16 @@ export const STICKY_SIZES = {
 
 export type StickySize = (typeof STICKY_SIZES)[keyof typeof STICKY_SIZES];
 
+export const STICKY_STATUSES = {
+  notStarted: "not-started",
+  inProgress: "in-progress",
+  done: "done",
+  blocked: "blocked",
+} as const;
+
+export type StickyStatus =
+  (typeof STICKY_STATUSES)[keyof typeof STICKY_STATUSES];
+
 export type EditMode = "add" | "arrange" | "execute";
 
 interface StickyContent {
@@ -37,7 +47,7 @@ interface Note {
   title: string;
   content: StickyContent;
   size?: StickySize;
-  status?: "not-started" | "in-progress" | "done" | "blocked";
+  status: StickyStatus;
   recursive: boolean;
   color: StickyNoteColor;
 }
@@ -102,6 +112,7 @@ interface BoardState {
   currentPan: Point;
   editMode: EditMode;
   isEditing: boolean;
+  selectedConnection?: number;
 
   // global UI actions
   openManifesto: () => void;
@@ -121,6 +132,7 @@ interface BoardState {
   cancelConnection: () => void;
   deleteConnection: (connectionId: number) => void;
   updateConnection: (id: number, updates: Partial<Connection>) => void;
+  changeSelectedConnection: (id: number | undefined) => void;
 
   // Settings actions
   changeSettings: (newSettings: Partial<BoardSettings>) => void;
@@ -159,6 +171,7 @@ const useBoardStore = create<BoardState>((set, get) => ({
   currentPan: { x: 0, y: 0 },
   editMode: "add",
   isEditing: false,
+  selectedConnection: undefined,
 
   openManifesto: () => set((state) => ({ ...state, manifestoOpen: true })),
   closeManifesto: () => set((state) => ({ ...state, manifestoOpen: false })),
@@ -182,6 +195,7 @@ const useBoardStore = create<BoardState>((set, get) => ({
           content: {},
           recursive: false,
           color: get().settings.defaultStickyColor,
+          status: "not-started",
         },
       ],
     }));
@@ -237,6 +251,7 @@ const useBoardStore = create<BoardState>((set, get) => ({
             : undefined,
       },
       recursive: false,
+      status: "not-started",
       color:
         noteId === 666 ? get().settings.defaultStickyColor : sourceNote.color, // Inherit color from source note
     };
@@ -324,6 +339,11 @@ const useBoardStore = create<BoardState>((set, get) => ({
           : conn
       ),
     })),
+  changeSelectedConnection: (id) => {
+    set((state) => ({
+      selectedConnection: id,
+    }));
+  },
 
   changeSettings: (newSettings: Partial<BoardSettings>) => {
     set((state) => {

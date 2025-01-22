@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import useBoardStore from "../BoardStore";
 import ConnectionLine from "./ConnectionLine";
-import StickyNoteV2 from "./StickyNotev2";
+import StickyNoteV2 from "./sticky/StickyNotev2";
 import SettingsMenu from "./controls/SettingsMenu";
 import GlobalTimeline from "./decorations/GlobalTimeline";
 import styled from "styled-components";

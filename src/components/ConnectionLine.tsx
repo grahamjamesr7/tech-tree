@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Trash2, X } from "lucide-react";
 import useBoardStore, { ConnectionStyle } from "../BoardStore";
 import { getConnectionPoint } from "../utils";
@@ -8,6 +8,7 @@ interface ConnectionLineProps {
 }
 
 interface RadialMenuProps {
+  id: number;
   x: number;
   y: number;
   style: ConnectionStyle;
@@ -28,6 +29,7 @@ function calculateArrowRotation(
 }
 
 export const RadialMenu: React.FC<RadialMenuProps> = ({
+  id,
   x,
   y,
   style,
@@ -37,6 +39,7 @@ export const RadialMenu: React.FC<RadialMenuProps> = ({
 }) => {
   return (
     <div
+      data-connection-menu={id}
       className="absolute bg-white rounded-full shadow-lg p-2 flex items-center gap-2 text-black"
       style={{
         left: x,
@@ -91,9 +94,15 @@ export const RadialMenu: React.FC<RadialMenuProps> = ({
 };
 
 const ConnectionLine: React.FC<ConnectionLineProps> = ({ id }) => {
-  const { notes, connections, deleteConnection, updateConnection, editMode } =
-    useBoardStore();
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const {
+    notes,
+    connections,
+    deleteConnection,
+    updateConnection,
+    editMode,
+    changeSelectedConnection,
+    selectedConnection,
+  } = useBoardStore();
 
   // Find the connection data
   const connection = connections.find((conn) => conn.id === id);
@@ -169,6 +178,25 @@ const ConnectionLine: React.FC<ConnectionLineProps> = ({ id }) => {
     updateConnection(id, { style: newStyle });
   };
 
+  // Add click handler effect
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      // Check if this connection is selected
+      if (selectedConnection === id) {
+        // Check if click was outside menu
+        const menu = document.querySelector(`[data-connection-menu="${id}"]`);
+        if (menu && !menu.contains(event.target as Node)) {
+          changeSelectedConnection(undefined);
+        }
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [id, selectedConnection, changeSelectedConnection]);
+
   return (
     <svg
       className="absolute top-0 left-0 w-full h-full"
@@ -202,7 +230,9 @@ const ConnectionLine: React.FC<ConnectionLineProps> = ({ id }) => {
         onClick={(e) => {
           if (editMode == "add") {
             e.stopPropagation();
-            setIsMenuOpen(!isMenuOpen);
+            if (selectedConnection != id) {
+              changeSelectedConnection(id);
+            }
           }
         }}
       />
@@ -219,7 +249,7 @@ const ConnectionLine: React.FC<ConnectionLineProps> = ({ id }) => {
       />
 
       {/* Radial menu */}
-      {isMenuOpen && (
+      {selectedConnection == id && (
         <foreignObject
           x={midX - 100}
           y={midY - 20}
@@ -232,12 +262,13 @@ const ConnectionLine: React.FC<ConnectionLineProps> = ({ id }) => {
             style={{ pointerEvents: "auto" }}
           >
             <RadialMenu
+              id={id}
               x={100}
               y={20}
               style={connection.style}
               onStyleChange={handleStyleChange}
               onDelete={() => deleteConnection(id)}
-              close={() => setIsMenuOpen(false)}
+              close={() => changeSelectedConnection(undefined)}
             />
           </div>
         </foreignObject>
