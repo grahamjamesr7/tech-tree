@@ -15,7 +15,7 @@ export default function WorkOnStickyMenu({
   function handleStatusUpdate(e: React.MouseEvent) {
     e.stopPropagation();
     const statuses = Object.values(STICKY_STATUSES);
-    const newStatus = statuses[statuses.indexOf(thisNote.status) + 1];
+    const newStatus = statuses[(statuses.indexOf(thisNote.status) + 1) % statuses.length];
 
     updateNote({ id: thisNote.id, status: newStatus });
   }
@@ -34,6 +34,12 @@ export default function WorkOnStickyMenu({
             padding: "0.5rem",
             fontSize: 10,
             fontWeight: "bold",
+            color: "white",
+            borderColor: "rgba(255, 255, 255, 0.23)",
+            "&:hover": {
+              borderColor: "rgba(255, 255, 255, 0.5)",
+              backgroundColor: "rgba(255, 255, 255, 0.1)"
+            }
           }}
         >
           {thisNote.status.charAt(0)}

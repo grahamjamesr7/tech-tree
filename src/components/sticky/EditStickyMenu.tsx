@@ -2,8 +2,8 @@ import React, { useState } from "react";
 import { Trash2 } from "lucide-react";
 import {
   STICKY_COLORS,
-  STICKY_SIZE_COPY_MAP,
-  STICKY_SIZE_NUMERIC_MAP,
+  ITEM_SIZE_COPY_MAP,
+  ITEM_SIZE_NUMERIC_MAP,
 } from "../../constants";
 import useBoardStore, { STICKY_SIZES } from "../../BoardStore";
 import { Button, Tooltip } from "@mui/material";
@@ -48,7 +48,7 @@ const EditStickyMenu: React.FC<StickyMenuProps> = ({ isVisible, id }) => {
     <StickyMenuContainer isVisible={isVisible}>
       <Tooltip title="Delete Note" arrow placement="left">
         <button
-          className="p-2 rounded hover:bg-red-50 text-black flex items-center justify-center"
+          className="p-2 rounded hover:bg-red-900/30 text-white flex items-center justify-center bg-slate-800"
           onClick={() =>
             settings.confirmDeletes && !deletionArmed
               ? setDeletionArmed(true)
@@ -60,7 +60,7 @@ const EditStickyMenu: React.FC<StickyMenuProps> = ({ isVisible, id }) => {
       </Tooltip>
       <Tooltip title="Change color" arrow placement="left">
         <div
-          className={`w-6 h-6 rounded-full ${thisNote.color.bgClass} hover:ring-2 ring-gray-400 cursor-pointer`}
+          className={`w-6 h-6 rounded-full ${thisNote.color.bgClass} hover:ring-2 ring-slate-400 cursor-pointer`}
           onClick={handleColorChange}
         />
       </Tooltip>
@@ -68,7 +68,14 @@ const EditStickyMenu: React.FC<StickyMenuProps> = ({ isVisible, id }) => {
         <Button
           variant="text"
           onClick={() => splitNote(id)}
-          sx={{ minWidth: "2.25rem", padding: "0.5rem" }}
+          sx={{ 
+            minWidth: "2.25rem", 
+            padding: "0.5rem",
+            color: "white",
+            "&:hover": {
+              backgroundColor: "rgba(255, 255, 255, 0.1)"
+            }
+          }}
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -100,12 +107,18 @@ const EditStickyMenu: React.FC<StickyMenuProps> = ({ isVisible, id }) => {
             padding: "0.5rem",
             fontSize: 10,
             fontWeight: "bold",
+            color: "white",
+            borderColor: "rgba(255, 255, 255, 0.23)",
+            "&:hover": {
+              borderColor: "rgba(255, 255, 255, 0.5)",
+              backgroundColor: "rgba(255, 255, 255, 0.1)"
+            }
           }}
         >
           {thisNote.size
             ? settings.showPoints
-              ? STICKY_SIZE_NUMERIC_MAP[thisNote.size]
-              : STICKY_SIZE_COPY_MAP[thisNote.size]
+              ? ITEM_SIZE_NUMERIC_MAP[thisNote.size]
+              : ITEM_SIZE_COPY_MAP[thisNote.size]
             : "-"}
         </Button>
       </Tooltip>

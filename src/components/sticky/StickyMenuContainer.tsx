@@ -13,7 +13,7 @@ export default function StickyMenuContainer({
         isVisible ? "opacity-100" : "opacity-0"
       }`}
     >
-      <div className="bg-white rounded-lg shadow-lg p-2 flex flex-col gap-2 items-center">
+      <div className="bg-slate-800 rounded-lg shadow-xl p-2 flex flex-col gap-2 items-center border border-slate-600">
         {children}
       </div>
     </div>

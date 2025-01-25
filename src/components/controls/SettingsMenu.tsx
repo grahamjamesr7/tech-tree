@@ -67,6 +67,9 @@ const SettingsMenu: React.FC<SettingsMenuProps> = ({ isOpen, onClose }) => {
           minWidth: 360,
           maxWidth: "90vw",
           m: 0,
+          bgcolor: 'rgb(30 41 59)', // slate-800
+          color: 'white',
+          border: '1px solid rgb(71 85 105)', // slate-600
         },
       }}
       onClick={(e) => e.stopPropagation()}
@@ -77,13 +80,14 @@ const SettingsMenu: React.FC<SettingsMenuProps> = ({ isOpen, onClose }) => {
           justifyContent: "space-between",
           alignItems: "center",
           pb: 1,
+          borderBottom: '1px solid rgb(71 85 105)', // slate-600
         }}
       >
         <Box>
-          <Typography variant="h6" component="div">
+          <Typography variant="h6" component="div" sx={{ color: 'white' }}>
             Settings
           </Typography>
-          <Typography variant="caption" color="text.secondary">
+          <Typography variant="caption" sx={{ color: 'rgb(148 163 184)' }}> {/* slate-400 */}
             Changes saved automatically
           </Typography>
         </Box>
@@ -91,16 +95,15 @@ const SettingsMenu: React.FC<SettingsMenuProps> = ({ isOpen, onClose }) => {
           onClick={onClose}
           size="small"
           sx={{
-            color: theme.palette.text.secondary,
+            color: 'rgb(148 163 184)', // slate-400
             "&:hover": {
-              backgroundColor: alpha(theme.palette.text.secondary, 0.1),
+              backgroundColor: 'rgba(148, 163, 184, 0.1)',
             },
           }}
         >
           <CloseIcon fontSize="small" />
         </IconButton>
       </DialogTitle>
-      <Divider />
       <DialogContent sx={{ pt: 2 }}>
         <FormGroup sx={{ mb: 3 }}>
           <FormControlLabel
@@ -110,16 +113,21 @@ const SettingsMenu: React.FC<SettingsMenuProps> = ({ isOpen, onClose }) => {
                 onChange={(e) =>
                   updateSettings({ confirmDeletes: e.target.checked })
                 }
-                color="primary"
+                sx={{
+                  color: 'rgb(148 163 184)', // slate-400
+                  '&.Mui-checked': {
+                    color: 'rgb(96 165 250)', // blue-400
+                  }
+                }}
               />
             }
             label={
               <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                 <DeleteOutlineIcon
-                  sx={{ color: theme.palette.text.secondary }}
+                  sx={{ color: 'rgb(148 163 184)' }} // slate-400
                   fontSize="small"
                 />
-                <Typography variant="body2">
+                <Typography variant="body2" sx={{ color: 'white' }}>
                   Confirm before deleting notes
                 </Typography>
               </Box>
@@ -130,16 +138,23 @@ const SettingsMenu: React.FC<SettingsMenuProps> = ({ isOpen, onClose }) => {
               <Checkbox
                 checked={localSettings.showGrid}
                 onChange={(e) => updateSettings({ showGrid: e.target.checked })}
-                color="primary"
+                sx={{
+                  color: 'rgb(148 163 184)', // slate-400
+                  '&.Mui-checked': {
+                    color: 'rgb(96 165 250)', // blue-400
+                  }
+                }}
               />
             }
             label={
               <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                 <GridOnIcon
-                  sx={{ color: theme.palette.text.secondary }}
+                  sx={{ color: 'rgb(148 163 184)' }} // slate-400
                   fontSize="small"
                 />
-                <Typography variant="body2">Show gridlines</Typography>
+                <Typography variant="body2" sx={{ color: 'white' }}>
+                  Show gridlines
+                </Typography>
               </Box>
             }
           />
@@ -150,16 +165,21 @@ const SettingsMenu: React.FC<SettingsMenuProps> = ({ isOpen, onClose }) => {
                 onChange={(e) =>
                   updateSettings({ showPoints: e.target.checked })
                 }
-                color="primary"
+                sx={{
+                  color: 'rgb(148 163 184)', // slate-400
+                  '&.Mui-checked': {
+                    color: 'rgb(96 165 250)', // blue-400
+                  }
+                }}
               />
             }
             label={
               <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                 <Numbers
-                  sx={{ color: theme.palette.text.secondary }}
+                  sx={{ color: 'rgb(148 163 184)' }} // slate-400
                   fontSize="small"
                 />
-                <Typography variant="body2">
+                <Typography variant="body2" sx={{ color: 'white' }}>
                   Use Points Instead of T-Shirt Sizes
                 </Typography>
               </Box>
@@ -172,16 +192,23 @@ const SettingsMenu: React.FC<SettingsMenuProps> = ({ isOpen, onClose }) => {
                 onChange={(e) =>
                   updateSettings({ enableAutoSave: e.target.checked })
                 }
-                color="primary"
+                sx={{
+                  color: 'rgb(148 163 184)', // slate-400
+                  '&.Mui-checked': {
+                    color: 'rgb(96 165 250)', // blue-400
+                  }
+                }}
               />
             }
             label={
               <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                 <Save
-                  sx={{ color: theme.palette.text.secondary }}
+                  sx={{ color: 'rgb(148 163 184)' }} // slate-400
                   fontSize="small"
                 />
-                <Typography variant="body2">Enable Autosave</Typography>
+                <Typography variant="body2" sx={{ color: 'white' }}>
+                  Enable Autosave
+                </Typography>
               </Box>
             }
           />
@@ -192,16 +219,21 @@ const SettingsMenu: React.FC<SettingsMenuProps> = ({ isOpen, onClose }) => {
                 onChange={(e) =>
                   updateSettings({ createNewOnCanvasClick: e.target.checked })
                 }
-                color="primary"
+                sx={{
+                  color: 'rgb(148 163 184)', // slate-400
+                  '&.Mui-checked': {
+                    color: 'rgb(96 165 250)', // blue-400
+                  }
+                }}
               />
             }
             label={
               <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                 <Rectangle
-                  sx={{ color: theme.palette.text.secondary }}
+                  sx={{ color: 'rgb(148 163 184)' }} // slate-400
                   fontSize="small"
                 />
-                <Typography variant="body2">
+                <Typography variant="body2" sx={{ color: 'white' }}>
                   Create a new sticky when making a new connection and the board
                   is clicked.
                 </Typography>
@@ -213,13 +245,13 @@ const SettingsMenu: React.FC<SettingsMenuProps> = ({ isOpen, onClose }) => {
         <Box sx={{ mb: 2 }}>
           <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 1.5 }}>
             <PaletteIcon
-              sx={{ color: theme.palette.text.secondary }}
+              sx={{ color: 'rgb(148 163 184)' }} // slate-400
               fontSize="small"
             />
             <Typography
               variant="subtitle2"
               sx={{
-                color: theme.palette.text.secondary,
+                color: 'rgb(148 163 184)', // slate-400
                 fontWeight: 500,
               }}
             >
@@ -243,11 +275,11 @@ const SettingsMenu: React.FC<SettingsMenuProps> = ({ isOpen, onClose }) => {
                     backgroundColor: color.rawColor,
                     border:
                       localSettings.defaultStickyColor.name === color.name
-                        ? `2px solid ${theme.palette.primary.main}`
+                        ? `2px solid rgb(96 165 250)` // blue-400
                         : "2px solid transparent",
                     "&:hover": {
                       backgroundColor: alpha(color.rawColor, 0.8),
-                      border: `2px solid ${theme.palette.primary.light}`,
+                      border: `2px solid rgb(147 197 253)`, // blue-300
                     },
                     transition: theme.transitions.create([
                       "border-color",

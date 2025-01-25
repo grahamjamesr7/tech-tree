@@ -2,17 +2,17 @@ import React, { useEffect, useState } from "react";
 import useBoardStore, { Side } from "../../BoardStore";
 import { Move } from "lucide-react";
 import { adjustHexColor } from "../../utils";
-import { STICKY_SIZE_COPY_MAP, STICKY_SIZE_NUMERIC_MAP } from "../../constants";
+import { ITEM_SIZE_COPY_MAP, ITEM_SIZE_NUMERIC_MAP } from "../../constants";
 import EditStickyMenu from "./EditStickyMenu";
 import WorkOnStickyMenu from "./WorkOnStickyMenu";
 
-interface StickyNoteProps {
+interface WorkItemProps {
   id: number;
   x: number;
   y: number;
 }
 
-const StickyNoteV2: React.FC<StickyNoteProps> = ({ id, x, y }) => {
+const WorkItem: React.FC<WorkItemProps> = ({ id, x, y }) => {
   const {
     startConnection,
     activeConnection,
@@ -98,7 +98,7 @@ const StickyNoteV2: React.FC<StickyNoteProps> = ({ id, x, y }) => {
 
   function changeHover(hover: boolean) {
     setIsHovered(hover);
-    setShowConn(hover && editMode == "add");
+    setShowConn(hover && editMode === "add");
   }
 
   useEffect(() => {
@@ -120,13 +120,16 @@ const StickyNoteV2: React.FC<StickyNoteProps> = ({ id, x, y }) => {
       endConnection(id, side);
     }
   }
+
+  useEffect(() => {
+    console.log("Current edit mode:", editMode);
+  }, [editMode]);
   return (
     <div
-      className={`absolute ${
-        thisNote.color.bgClass
-      } w-48 h-48 p-4 shadow-lg rounded-sm font-lato flex flex-col sticky-note
+      className={`absolute w-48 h-48 p-4 shadow-lg rounded-md font-lato flex flex-col
+      ${isDragging ? "cursor-grabbing" : ""}
       ${activeConnection?.fromId == id ? "ring-2 ring-blue-500" : ""}
-      ${isDragging ? "cursor-grabbing" : ""}`}
+      bg-slate-800 border-2 border-slate-600`}
       onMouseEnter={() => changeHover(true)}
       onMouseLeave={() => changeHover(false)}
       style={{
@@ -135,56 +138,64 @@ const StickyNoteV2: React.FC<StickyNoteProps> = ({ id, x, y }) => {
         transform: "translate(-50%, -50%)",
         zIndex: isDragging ? 1000 : 1,
         cursor: isDragging ? "grabbing" : "auto",
+        background: `linear-gradient(135deg, ${thisNote.color.rawColor}22 0%, ${thisNote.color.rawColor}44 100%)`,
+        boxShadow: `0 0 20px ${thisNote.color.rawColor}22`,
       }}
       onClick={(e) => e.stopPropagation()}
     >
       <div
-        className={`connection-handle absolute top-0 left-1/2 w-3 h-3 bg-blue-500 rounded-full cursor-pointer transform -translate-x-1/2 -translate-y-1/2 transition-opacity duration-200 ${
-          showConn ? "opacity-100" : "opacity-0"
-        }`}
+        className={`connection-handle absolute top-0 left-1/2 w-4 h-4 rounded-full cursor-pointer transform -translate-x-1/2 -translate-y-1/2 transition-all duration-200 
+        border-2 border-slate-400 bg-slate-800 hover:border-blue-400 
+        ${showConn ? "opacity-100 scale-100" : "opacity-0 scale-75"}`}
         onMouseDown={(e) => connectorClicked(e, "top")}
       />
       <div
-        className={`connection-handle absolute top-1/2 right-0 w-3 h-3 bg-blue-500 rounded-full cursor-pointer transform translate-x-1/2 -translate-y-1/2 transition-opacity duration-200 ${
-          showConn ? "opacity-100" : "opacity-0"
-        }`}
+        className={`connection-handle absolute top-1/2 right-0 w-4 h-4 rounded-full cursor-pointer transform translate-x-1/2 -translate-y-1/2 transition-all duration-200 
+        border-2 border-slate-400 bg-slate-800 hover:border-blue-400
+        ${showConn ? "opacity-100 scale-100" : "opacity-0 scale-75"}`}
         onMouseDown={(e) => connectorClicked(e, "right")}
       />
       <div
-        className={`connection-handle absolute top-1/2 left-0 w-3 h-3 bg-blue-500 rounded-full cursor-pointer transform -translate-x-1/2 -translate-y-1/2 transition-opacity duration-200 ${
-          showConn ? "opacity-100" : "opacity-0"
-        }`}
+        className={`connection-handle absolute top-1/2 left-0 w-4 h-4 rounded-full cursor-pointer transform -translate-x-1/2 -translate-y-1/2 transition-all duration-200 
+        border-2 border-slate-400 bg-slate-800 hover:border-blue-400
+        ${showConn ? "opacity-100 scale-100" : "opacity-0 scale-75"}`}
         onMouseDown={(e) => connectorClicked(e, "left")}
       />
       <div
-        className={`connection-handle absolute bottom-0 left-1/2 w-3 h-3 bg-blue-500 rounded-full cursor-pointer transform -translate-x-1/2 translate-y-1/2 transition-opacity duration-200 ${
-          showConn ? "opacity-100" : "opacity-0"
-        }`}
+        className={`connection-handle absolute bottom-0 left-1/2 w-4 h-4 rounded-full cursor-pointer transform -translate-x-1/2 translate-y-1/2 transition-all duration-200 
+        border-2 border-slate-400 bg-slate-800 hover:border-blue-400
+        ${showConn ? "opacity-100 scale-100" : "opacity-0 scale-75"}`}
         onMouseDown={(e) => connectorClicked(e, "bottom")}
       />
+
       <div
         className={`absolute -top-10 left-0 w-full transition-opacity ${
-          showConn ? "opacity-100" : "opacity-0"
+          isHovered ? "opacity-100" : "opacity-0"
         }`}
       >
-        <div className="flex justify-between px-2">
-          <button
-            className={`px-2 py-1 rounded hover:bg-gray-200 bg-white text-black flex items-center justify-center ${
-              isDragging ? "cursor-grabbing" : "cursor-grab"
-            }`}
-            onMouseDown={handleMouseDown}
-          >
-            <Move size={16} />
-          </button>
-        </div>
+        {editMode !== "execute" && (
+          <>
+            <div className="flex justify-between px-2">
+              <button
+                className={`px-2 py-1 rounded-md bg-slate-700 hover:bg-slate-600 text-white flex items-center justify-center border border-slate-500 ${
+                  isDragging ? "cursor-grabbing" : "cursor-grab"
+                }`}
+                onMouseDown={handleMouseDown}
+              >
+                <Move size={16} />
+              </button>
+            </div>
+            <EditStickyMenu id={id} isVisible={isHovered} />
+          </>
+        )}
 
-        {editMode == "add" && <EditStickyMenu id={id} isVisible={isHovered} />}
-        {editMode == "execute" && (
+        {editMode === "execute" && (
           <WorkOnStickyMenu noteId={id} isVisible={isHovered} />
         )}
       </div>
+
       <textarea
-        className="w-full bg-transparent resize-none border-none focus:outline-none font-lato text-black font-bold text-lg mb-2"
+        className="w-full bg-transparent resize-none border-none focus:outline-none font-lato text-white font-bold text-lg mb-2"
         style={{
           height: "1.5rem",
           minHeight: "1.5rem",
@@ -209,14 +220,14 @@ const StickyNoteV2: React.FC<StickyNoteProps> = ({ id, x, y }) => {
         onChange={(e) => {
           updateNote({ id, title: e.target.value });
           changeIsEditing(true);
-          // Automatically adjust height based on content
           e.target.style.height = "1.5rem";
           const scrollHeight = Math.min(e.target.scrollHeight, 48);
           e.target.style.height = scrollHeight + "px";
         }}
       />
+
       <textarea
-        className="w-full flex-1 bg-transparent resize-none border-none focus:outline-none font-lato text-black text-sm"
+        className="w-full flex-1 bg-transparent resize-none border-none focus:outline-none font-lato text-white text-sm"
         placeholder="Description..."
         onClick={(e) => e.stopPropagation()}
         value={thisNote.content.summary}
@@ -226,23 +237,24 @@ const StickyNoteV2: React.FC<StickyNoteProps> = ({ id, x, y }) => {
           changeIsEditing(true);
         }}
       />
+
       {thisNote.size && !isEditing && (
         <div
-          className={`absolute bottom-2 right-2`}
+          className={`absolute bottom-2 right-2 px-2 py-1 rounded-md bg-slate-900/50 text-sm`}
           style={{
-            color: adjustHexColor(thisNote.color.rawColor, -0.2),
+            color: adjustHexColor(thisNote.color.rawColor, 0.2),
             fontWeight: 700,
             opacity: !isEditing ? 1 : 0,
             transition: "opacity 1s ease-in-out",
           }}
         >
           {settings.showPoints
-            ? STICKY_SIZE_NUMERIC_MAP[thisNote.size]
-            : STICKY_SIZE_COPY_MAP[thisNote.size]}
+            ? ITEM_SIZE_NUMERIC_MAP[thisNote.size]
+            : ITEM_SIZE_COPY_MAP[thisNote.size]}
         </div>
       )}
     </div>
   );
 };
 
-export default StickyNoteV2;
+export default WorkItem;

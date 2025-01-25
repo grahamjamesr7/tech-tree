@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import useBoardStore from "../BoardStore";
 import ConnectionLine from "./ConnectionLine";
-import StickyNoteV2 from "./sticky/StickyNotev2";
 import SettingsMenu from "./controls/SettingsMenu";
 import GlobalTimeline from "./decorations/GlobalTimeline";
 import styled from "styled-components";
@@ -11,19 +10,21 @@ import { usePanning } from "../hooks/usePanning";
 import { useZoom } from "../hooks/useZoom";
 import GlobalMenu from "./controls/GlobalMenu";
 import Autosaver from "./AutoSaver";
+import WorkItem from "./sticky/WorkItem";
 
 const GridBackground = styled.div<{
   zoom: number;
   pan: { x: number; y: number };
 }>`
-  position: fixed; // Changed from absolute to fixed
+  position: fixed;
   inset: 0;
-  opacity: 0.1;
+  opacity: 0.07;
   background-size: ${({ zoom }) => `${40 * zoom}px ${40 * zoom}px`};
-  background-image: linear-gradient(to right, #000 1px, transparent 1px),
-    linear-gradient(to bottom, #000 1px, transparent 1px);
+  background-image: linear-gradient(to right, #ffffff 1px, transparent 1px),
+    linear-gradient(to bottom, #ffffff 1px, transparent 1px);
   background-position: ${({ pan }) => `${pan.x}px ${pan.y}px`};
   pointer-events: none;
+  background-color: #0f172a; /* slate-900 */
 `;
 
 const SpatialBoardV2: React.FC = () => {
@@ -96,7 +97,7 @@ const SpatialBoardV2: React.FC = () => {
   return (
     <div
       id="canvas-background"
-      className="relative w-full h-screen bg-white overflow-hidden font-lato"
+      className="relative w-full h-screen bg-slate-900 overflow-hidden font-lato"
       onClick={handleCanvasClick}
       onWheel={handleWheel}
       onMouseUp={handleMouseUp}
@@ -127,7 +128,7 @@ const SpatialBoardV2: React.FC = () => {
         }}
       >
         {notes.map((n) => (
-          <StickyNoteV2 key={n.id} {...n} />
+          <WorkItem key={n.id} {...n} />
         ))}
         {connections.map((conn) => (
           <ConnectionLine key={conn.id} id={conn.id} />

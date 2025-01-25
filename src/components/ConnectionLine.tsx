@@ -40,7 +40,7 @@ export const RadialMenu: React.FC<RadialMenuProps> = ({
   return (
     <div
       data-connection-menu={id}
-      className="absolute bg-white rounded-full shadow-lg p-2 flex items-center gap-2 text-black"
+      className="absolute bg-slate-800 border border-slate-600 rounded-full shadow-lg p-2 flex items-center gap-2 text-white"
       style={{
         left: x,
         top: y,
@@ -52,7 +52,7 @@ export const RadialMenu: React.FC<RadialMenuProps> = ({
       }}
     >
       <button
-        className="p-1 hover:bg-gray-100 rounded-full"
+        className="p-1 hover:bg-slate-700 rounded-full"
         onClick={() =>
           onStyleChange({
             type: style.type === "dependency" ? "informs" : "dependency",
@@ -64,7 +64,7 @@ export const RadialMenu: React.FC<RadialMenuProps> = ({
         </span>
       </button>
       <button
-        className="p-1 hover:bg-gray-100 rounded-full"
+        className="p-1 hover:bg-slate-700 rounded-full"
         onClick={() => onStyleChange({ isCurved: !style.isCurved })}
       >
         <svg
@@ -82,11 +82,11 @@ export const RadialMenu: React.FC<RadialMenuProps> = ({
           )}
         </svg>
       </button>
-      <button className="p-1 hover:bg-gray-100 rounded-full" onClick={onDelete}>
-        <Trash2 size={16} className="text-red-500" />
+      <button className="p-1 hover:bg-slate-700 rounded-full" onClick={onDelete}>
+        <Trash2 size={16} className="text-red-400" />
       </button>
 
-      <button className="p-1 hover:bg-gray-100 rounded-full" onClick={close}>
+      <button className="p-1 hover:bg-slate-700 rounded-full" onClick={close}>
         <X size={16} />
       </button>
     </div>
@@ -213,7 +213,7 @@ const ConnectionLine: React.FC<ConnectionLineProps> = ({ id }) => {
           orient={arrowRotation}
           markerUnits="strokeWidth"
         >
-          <polygon points="0 0, 5 2, 0 4" fill="black" stroke="none" />
+          <polygon points="0 0, 5 2, 0 4" fill="white" stroke="none" />
         </marker>
       </defs>
 
@@ -240,7 +240,8 @@ const ConnectionLine: React.FC<ConnectionLineProps> = ({ id }) => {
       {/* Visible path */}
       <path
         d={path}
-        stroke="black"
+        stroke="white"
+        strokeOpacity={0.6}
         strokeWidth={connection.style.type === "informs" ? 4 : 6}
         strokeDasharray={connection.style.type === "informs" ? "5,5" : "none"}
         fill="none"

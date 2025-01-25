@@ -136,7 +136,7 @@ export const DEFAULT_CONNECTIONS: Connection[] = [
   },
 ];
 
-export const STICKY_SIZE_COPY_MAP: Record<StickySize, string> = {
+export const ITEM_SIZE_COPY_MAP: Record<StickySize, string> = {
   trivial: "XXS",
   "extra-small": "XS",
   small: "S",
@@ -146,7 +146,7 @@ export const STICKY_SIZE_COPY_MAP: Record<StickySize, string> = {
   "too-big": "XXL",
 };
 
-export const STICKY_SIZE_NUMERIC_MAP: Record<StickySize, number> = {
+export const ITEM_SIZE_NUMERIC_MAP: Record<StickySize, number> = {
   trivial: 1,
   "extra-small": 2,
   small: 3,

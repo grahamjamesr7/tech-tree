@@ -1,8 +1,7 @@
-import { ButtonGroup, darken, IconButton, Paper, Tooltip } from "@mui/material";
+import { ButtonGroup, IconButton, Tooltip } from "@mui/material";
 import { BoxSelectIcon, Keyboard, Plus } from "lucide-react";
 import React, { ReactNode } from "react";
 import useBoardStore, { EditMode } from "../../BoardStore";
-import { STICKY_COLORS } from "../../constants";
 
 interface Mode {
   tooltip: string;
@@ -16,17 +15,17 @@ export default function GlobalToolbar() {
   const modes: Mode[] = [
     {
       tooltip: "(cmd + E) - Implementer/Worker Mode",
-      icon: <Keyboard fontSize={24} />,
+      icon: <Keyboard size={20} />,
       mode: "execute",
     },
     {
-      tooltip: "(cmd + A) - Add/Edit Mode",
-      icon: <Plus fontSize={24} />,
+      tooltip: "(cmd + A) - Add/Edit Mode", 
+      icon: <Plus size={20} />,
       mode: "add",
     },
     {
       tooltip: "(cmd + S) - Select/Arrange Mode",
-      icon: <BoxSelectIcon fontSize={24} />,
+      icon: <BoxSelectIcon size={20} />,
       mode: "arrange",
     },
   ];
@@ -55,17 +54,8 @@ export default function GlobalToolbar() {
   }, [changeMode]);
 
   return (
-    <Paper
-      elevation={1}
-      sx={{
-        borderRadius: "1rem",
-        padding: "0.5rem",
-        position: "fixed",
-        top: "1rem",
-        left: "50%",
-        transform: "translateX(-50%)",
-        backgroundColor: "white",
-      }}
+    <div
+      className="fixed top-4 left-1/2 -translate-x-1/2 bg-slate-800 border-2 border-slate-600 rounded-2xl p-2 shadow-lg"
     >
       <ButtonGroup
         sx={{
@@ -74,9 +64,10 @@ export default function GlobalToolbar() {
             minWidth: "3rem",
             padding: "0.5rem",
             border: "none",
-            margin: "0 0.5rem", // Increased from 0.25rem to 0.5rem
+            margin: "0 0.5rem",
+            color: "white",
           },
-          gap: "0.5rem", // Added gap property
+          gap: "0.5rem",
         }}
         size="large"
       >
@@ -85,11 +76,13 @@ export default function GlobalToolbar() {
             <IconButton
               sx={{
                 borderRadius: "1rem",
-                backgroundColor:
-                  currentMode == m.mode ? STICKY_COLORS[0].rawColor : "#f5f5f5",
+                backgroundColor: currentMode == m.mode ? "rgb(51 65 85)" : "rgb(30 41 59)", // slate-700 : slate-800
                 "&:hover": {
-                  backgroundColor: darken(STICKY_COLORS[0].rawColor, 0.05),
+                  backgroundColor: "rgb(51 65 85)", // slate-700
                 },
+                "& svg": {
+                  color: "white"
+                }
               }}
               size="large"
               onClick={() => changeMode(m.mode)}
@@ -99,6 +92,6 @@ export default function GlobalToolbar() {
           </Tooltip>
         ))}
       </ButtonGroup>
-    </Paper>
+    </div>
   );
 }

@@ -25,16 +25,26 @@ const GlobalMenu: React.FC<GlobalMenuProps> = ({ setSettingsOpen }) => {
     setSaveSuccess(true);
     setTimeout(() => setSaveSuccess(false), 1500);
   };
+
   return (
     <SpeedDial
       ariaLabel="Board actions"
-      sx={{ position: "absolute", top: 16, left: 16 }}
+      sx={{ 
+        position: "absolute", 
+        top: 16, 
+        left: 16,
+        "& .MuiSpeedDial-fab": {
+          bgcolor: "rgb(30 41 59)", // slate-800
+          color: "white",
+          border: "2px solid rgb(71 85 105)", // slate-600
+          "&:hover": {
+            bgcolor: "rgb(51 65 85)", // slate-700
+          }
+        }
+      }}
       icon={<Ellipsis />}
       direction="down"
       onClick={(e) => e.stopPropagation()}
-      FabProps={{
-        color: "info",
-      }}
     >
       <SpeedDialAction
         icon={<Trash2 size={20} />}
@@ -58,14 +68,17 @@ const GlobalMenu: React.FC<GlobalMenuProps> = ({ setSettingsOpen }) => {
           "& .MuiSpeedDialAction-staticTooltipLabel": {
             minWidth: "120px",
             textAlign: "center",
+            bgcolor: "rgb(30 41 59)", // slate-800
+            color: "white",
           },
         }}
         FabProps={{
           sx: {
-            bgcolor: armed ? "error.main" : "background.paper",
-            color: armed ? "white" : "black",
+            bgcolor: armed ? "rgb(239 68 68)" : "rgb(30 41 59)", // red-500 : slate-800
+            color: "white",
+            border: "2px solid rgb(71 85 105)", // slate-600
             "&:hover": {
-              bgcolor: armed ? "error.dark" : "background.default",
+              bgcolor: armed ? "rgb(220 38 38)" : "rgb(51 65 85)", // red-600 : slate-700
             },
           },
         }}
@@ -77,11 +90,18 @@ const GlobalMenu: React.FC<GlobalMenuProps> = ({ setSettingsOpen }) => {
         tooltipOpen
         tooltipPlacement="right"
         sx={{
-          "& .MuiButtonBase-root": {
-            bgcolor: saveSuccess ? "success.main" : "background.paper",
-            color: saveSuccess ? "white" : "black",
+          "& .MuiSpeedDialAction-staticTooltipLabel": {
+            bgcolor: "rgb(30 41 59)", // slate-800
+            color: "white",
+          }
+        }}
+        FabProps={{
+          sx: {
+            bgcolor: saveSuccess ? "rgb(34 197 94)" : "rgb(30 41 59)", // green-500 : slate-800
+            color: "white",
+            border: "2px solid rgb(71 85 105)", // slate-600
             "&:hover": {
-              bgcolor: saveSuccess ? "success.dark" : "background.default",
+              bgcolor: saveSuccess ? "rgb(22 163 74)" : "rgb(51 65 85)", // green-600 : slate-700
             },
           },
         }}
@@ -95,6 +115,22 @@ const GlobalMenu: React.FC<GlobalMenuProps> = ({ setSettingsOpen }) => {
         }}
         tooltipOpen
         tooltipPlacement="right"
+        sx={{
+          "& .MuiSpeedDialAction-staticTooltipLabel": {
+            bgcolor: "rgb(30 41 59)", // slate-800
+            color: "white",
+          }
+        }}
+        FabProps={{
+          sx: {
+            bgcolor: "rgb(30 41 59)", // slate-800
+            color: "white", 
+            border: "2px solid rgb(71 85 105)", // slate-600
+            "&:hover": {
+              bgcolor: "rgb(51 65 85)", // slate-700
+            },
+          },
+        }}
       />
       {/* <SpeedDialAction
         icon={<Newspaper size={20} />}

@@ -6,7 +6,7 @@ const GlobalTimeline: React.FC = () => {
       <div className="h-full w-8 relative flex flex-col">
         {/* "Now" label at top */}
         <div className="py-4">
-          <div className="text-xs text-center font-medium text-gray-600">
+          <div className="text-sm text-center font-bold text-white">
             Now
           </div>
         </div>
@@ -21,8 +21,8 @@ const GlobalTimeline: React.FC = () => {
                 y1="0"
                 x2="50%"
                 y2="100%"
-                stroke="#9CA3AF"
-                strokeWidth="2"
+                stroke="#94a3b8"
+                strokeWidth="3"
                 strokeDasharray="25,25"
               />
             </svg>
@@ -31,7 +31,7 @@ const GlobalTimeline: React.FC = () => {
 
         {/* "Future" label at bottom */}
         <div className="py-4">
-          <div className="text-xs text-center font-medium text-gray-600">
+          <div className="text-sm text-center font-bold text-white">
             Future
           </div>
         </div>
