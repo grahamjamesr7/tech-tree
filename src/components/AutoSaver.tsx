@@ -12,11 +12,9 @@ export default function Autosaver() {
 
   useEffect(() => {
     if (!settings.enableAutoSave) {
-      console.debug("Autosave disabled");
       return;
     }
 
-    console.debug("Setting up autosave interval");
 
     const intervalId = setInterval(() => {
       try {
@@ -24,7 +22,6 @@ export default function Autosaver() {
         setTimeout(() => setFakeLoading(false), 1000);
         const saveTime = saveBoard();
         setSuccess(saveTime !== undefined);
-        console.debug("Autosave attempt at:", saveTime);
       } catch (error) {
         console.error("Autosave failed:", error);
         setSuccess(false);
@@ -32,7 +29,6 @@ export default function Autosaver() {
     }, AUTOSAVE_MILLIS);
 
     return () => {
-      console.debug("Cleaning up autosave interval");
       clearInterval(intervalId);
     };
   }, [settings.enableAutoSave, saveBoard]);
