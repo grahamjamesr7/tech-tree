@@ -1,10 +1,9 @@
 import React, { useEffect, useState } from "react";
-import useBoardStore, { Side } from "../../BoardStore";
+import useBoardStore, { Side, STICKY_STATUSES, STICKY_SIZES } from "../../BoardStore";
 import { Move } from "lucide-react";
 import { adjustHexColor } from "../../utils";
 import { ITEM_SIZE_COPY_MAP, ITEM_SIZE_NUMERIC_MAP } from "../../constants";
 import EditStickyMenu from "./EditStickyMenu";
-import WorkOnStickyMenu from "./WorkOnStickyMenu";
 
 interface WorkItemProps {
   id: number;
@@ -126,10 +125,10 @@ const WorkItem: React.FC<WorkItemProps> = ({ id, x, y }) => {
   }, [editMode]);
   return (
     <div
-      className={`absolute w-48 h-48 p-4 shadow-lg rounded-md font-lato flex flex-col
+      className={`absolute w-64 h-56 shadow-lg font-lato flex flex-col
       ${isDragging ? "cursor-grabbing" : ""}
       ${activeConnection?.fromId == id ? "ring-2 ring-blue-500" : ""}
-      bg-slate-800 border-2 border-slate-600`}
+      bg-slate-900`}
       onMouseEnter={() => changeHover(true)}
       onMouseLeave={() => changeHover(false)}
       style={{
@@ -138,35 +137,144 @@ const WorkItem: React.FC<WorkItemProps> = ({ id, x, y }) => {
         transform: "translate(-50%, -50%)",
         zIndex: isDragging ? 1000 : 1,
         cursor: isDragging ? "grabbing" : "auto",
-        background: `linear-gradient(135deg, ${thisNote.color.rawColor}22 0%, ${thisNote.color.rawColor}44 100%)`,
-        boxShadow: `0 0 20px ${thisNote.color.rawColor}22`,
+        boxShadow: `0 0 0 2px rgb(51 65 85), 0 0 0 4px ${thisNote.color.rawColor}44, 0 0 20px ${thisNote.color.rawColor}22`,
       }}
       onClick={(e) => e.stopPropagation()}
     >
       <div
-        className={`connection-handle absolute top-0 left-1/2 w-4 h-4 rounded-full cursor-pointer transform -translate-x-1/2 -translate-y-1/2 transition-all duration-200 
-        border-2 border-slate-400 bg-slate-800 hover:border-blue-400 
+        className={`connection-handle absolute top-0 left-1/2 w-3 h-3 cursor-pointer transform -translate-x-1/2 -translate-y-1/2 transition-all duration-200 
+        bg-white border-2 border-slate-600 hover:border-blue-400 
         ${showConn ? "opacity-100 scale-100" : "opacity-0 scale-75"}`}
+        style={{
+          clipPath: "polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%)"
+        }}
         onMouseDown={(e) => connectorClicked(e, "top")}
       />
       <div
-        className={`connection-handle absolute top-1/2 right-0 w-4 h-4 rounded-full cursor-pointer transform translate-x-1/2 -translate-y-1/2 transition-all duration-200 
-        border-2 border-slate-400 bg-slate-800 hover:border-blue-400
+        className={`connection-handle absolute top-1/2 right-0 w-3 h-3 cursor-pointer transform translate-x-1/2 -translate-y-1/2 transition-all duration-200 
+        bg-white border-2 border-slate-600 hover:border-blue-400
         ${showConn ? "opacity-100 scale-100" : "opacity-0 scale-75"}`}
+        style={{
+          clipPath: "polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%)"
+        }}
         onMouseDown={(e) => connectorClicked(e, "right")}
       />
       <div
-        className={`connection-handle absolute top-1/2 left-0 w-4 h-4 rounded-full cursor-pointer transform -translate-x-1/2 -translate-y-1/2 transition-all duration-200 
-        border-2 border-slate-400 bg-slate-800 hover:border-blue-400
+        className={`connection-handle absolute top-1/2 left-0 w-3 h-3 cursor-pointer transform -translate-x-1/2 -translate-y-1/2 transition-all duration-200 
+        bg-white border-2 border-slate-600 hover:border-blue-400
         ${showConn ? "opacity-100 scale-100" : "opacity-0 scale-75"}`}
+        style={{
+          clipPath: "polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%)"
+        }}
         onMouseDown={(e) => connectorClicked(e, "left")}
       />
       <div
-        className={`connection-handle absolute bottom-0 left-1/2 w-4 h-4 rounded-full cursor-pointer transform -translate-x-1/2 translate-y-1/2 transition-all duration-200 
-        border-2 border-slate-400 bg-slate-800 hover:border-blue-400
+        className={`connection-handle absolute bottom-0 left-1/2 w-3 h-3 cursor-pointer transform -translate-x-1/2 translate-y-1/2 transition-all duration-200 
+        bg-white border-2 border-slate-600 hover:border-blue-400
         ${showConn ? "opacity-100 scale-100" : "opacity-0 scale-75"}`}
+        style={{
+          clipPath: "polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%)"
+        }}
         onMouseDown={(e) => connectorClicked(e, "bottom")}
       />
+
+      <div 
+        className="h-1.5 w-full"
+        style={{ backgroundColor: thisNote.color.rawColor }}
+      />
+
+      <div className="flex-1 flex flex-col p-4">
+        <textarea
+          className="w-full bg-transparent resize-none border-none focus:outline-none font-lato text-white font-bold text-lg mb-2"
+          style={{
+            height: "1.5rem",
+            minHeight: "1.5rem",
+            maxHeight: "3rem",
+            lineHeight: "1.5rem",
+            overflow: "hidden",
+          }}
+          disabled={editMode != "add"}
+          placeholder="Title..."
+          onClick={(e) => {
+            e.stopPropagation();
+            changeIsEditing(true);
+          }}
+          value={thisNote.title}
+          ref={(textarea) => {
+            if (textarea) {
+              textarea.style.height = "1.5rem";
+              const scrollHeight = Math.min(textarea.scrollHeight, 48);
+              textarea.style.height = scrollHeight + "px";
+            }
+          }}
+          onChange={(e) => {
+            updateNote({ id, title: e.target.value });
+            changeIsEditing(true);
+            e.target.style.height = "1.5rem";
+            const scrollHeight = Math.min(e.target.scrollHeight, 48);
+            e.target.style.height = scrollHeight + "px";
+          }}
+        />
+
+        <textarea
+          className="w-full flex-1 bg-transparent resize-none border-none focus:outline-none font-lato text-slate-300 text-sm"
+          placeholder="Description..."
+          onClick={(e) => e.stopPropagation()}
+          value={thisNote.content.summary}
+          disabled={editMode != "add"}
+          onChange={(e) => {
+            updateNote({ id, content: { summary: e.target.value } });
+            changeIsEditing(true);
+          }}
+        />
+      </div>
+
+      <div className="h-12 px-4 py-2 border-t border-slate-700 flex items-center justify-between bg-slate-800/50">
+        <div 
+          className="flex items-center gap-2 cursor-pointer hover:bg-slate-700/50 px-2 py-1 rounded-sm"
+          onClick={(e) => {
+            e.stopPropagation();
+            const statuses = Object.values(STICKY_STATUSES);
+            const newStatus = statuses[(statuses.indexOf(thisNote.status) + 1) % statuses.length];
+            updateNote({ id: thisNote.id, status: newStatus });
+          }}
+        >
+          <div className="w-2 h-2 rounded-full" 
+            style={{ 
+              backgroundColor: thisNote.status === 'done' ? '#22c55e' : 
+                             thisNote.status === 'in-progress' ? '#3b82f6' :
+                             thisNote.status === 'blocked' ? '#ef4444' : '#94a3b8'
+            }} 
+          />
+          <span className="text-xs font-medium text-slate-300 uppercase tracking-wider">
+            {thisNote.status.replace('-', ' ')}
+          </span>
+        </div>
+
+        <div
+          className="flex items-center gap-1.5 cursor-pointer hover:bg-slate-700/50 px-2 py-1 rounded-sm"
+          onClick={(e) => {
+            e.stopPropagation();
+            const sizes = Object.values(STICKY_SIZES);
+            const newSize =
+              thisNote.size === undefined
+                ? STICKY_SIZES.trivial
+                : thisNote.size === STICKY_SIZES.tooBig
+                ? undefined
+                : sizes[sizes.indexOf(thisNote.size) + 1];
+
+            updateNote({ id, size: newSize });
+          }}
+        >
+          <span className="text-sm font-mono font-bold text-white">
+            {thisNote.size
+              ? settings.showPoints
+                ? ITEM_SIZE_NUMERIC_MAP[thisNote.size]
+                : ITEM_SIZE_COPY_MAP[thisNote.size]
+              : "-"}
+          </span>
+        </div>
+      </div>
 
       <div
         className={`absolute -top-10 left-0 w-full transition-opacity ${
@@ -177,7 +285,7 @@ const WorkItem: React.FC<WorkItemProps> = ({ id, x, y }) => {
           <>
             <div className="flex justify-between px-2">
               <button
-                className={`px-2 py-1 rounded-md bg-slate-700 hover:bg-slate-600 text-white flex items-center justify-center border border-slate-500 ${
+                className={`px-2 py-1 rounded-sm bg-slate-800 hover:bg-slate-700 text-white flex items-center justify-center border border-slate-600 ${
                   isDragging ? "cursor-grabbing" : "cursor-grab"
                 }`}
                 onMouseDown={handleMouseDown}
@@ -188,71 +296,7 @@ const WorkItem: React.FC<WorkItemProps> = ({ id, x, y }) => {
             <EditStickyMenu id={id} isVisible={isHovered} />
           </>
         )}
-
-        {editMode === "execute" && (
-          <WorkOnStickyMenu noteId={id} isVisible={isHovered} />
-        )}
       </div>
-
-      <textarea
-        className="w-full bg-transparent resize-none border-none focus:outline-none font-lato text-white font-bold text-lg mb-2"
-        style={{
-          height: "1.5rem",
-          minHeight: "1.5rem",
-          maxHeight: "3rem",
-          lineHeight: "1.5rem",
-          overflow: "hidden",
-        }}
-        disabled={editMode != "add"}
-        placeholder="Title..."
-        onClick={(e) => {
-          e.stopPropagation();
-          changeIsEditing(true);
-        }}
-        value={thisNote.title}
-        ref={(textarea) => {
-          if (textarea) {
-            textarea.style.height = "1.5rem";
-            const scrollHeight = Math.min(textarea.scrollHeight, 48);
-            textarea.style.height = scrollHeight + "px";
-          }
-        }}
-        onChange={(e) => {
-          updateNote({ id, title: e.target.value });
-          changeIsEditing(true);
-          e.target.style.height = "1.5rem";
-          const scrollHeight = Math.min(e.target.scrollHeight, 48);
-          e.target.style.height = scrollHeight + "px";
-        }}
-      />
-
-      <textarea
-        className="w-full flex-1 bg-transparent resize-none border-none focus:outline-none font-lato text-white text-sm"
-        placeholder="Description..."
-        onClick={(e) => e.stopPropagation()}
-        value={thisNote.content.summary}
-        disabled={editMode != "add"}
-        onChange={(e) => {
-          updateNote({ id, content: { summary: e.target.value } });
-          changeIsEditing(true);
-        }}
-      />
-
-      {thisNote.size && !isEditing && (
-        <div
-          className={`absolute bottom-2 right-2 px-2 py-1 rounded-md bg-slate-900/50 text-sm`}
-          style={{
-            color: adjustHexColor(thisNote.color.rawColor, 0.2),
-            fontWeight: 700,
-            opacity: !isEditing ? 1 : 0,
-            transition: "opacity 1s ease-in-out",
-          }}
-        >
-          {settings.showPoints
-            ? ITEM_SIZE_NUMERIC_MAP[thisNote.size]
-            : ITEM_SIZE_COPY_MAP[thisNote.size]}
-        </div>
-      )}
     </div>
   );
 };

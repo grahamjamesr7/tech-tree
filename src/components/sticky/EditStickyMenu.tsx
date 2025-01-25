@@ -2,10 +2,8 @@ import React, { useState } from "react";
 import { Trash2 } from "lucide-react";
 import {
   STICKY_COLORS,
-  ITEM_SIZE_COPY_MAP,
-  ITEM_SIZE_NUMERIC_MAP,
 } from "../../constants";
-import useBoardStore, { STICKY_SIZES } from "../../BoardStore";
+import useBoardStore from "../../BoardStore";
 import { Button, Tooltip } from "@mui/material";
 import StickyMenuContainer from "./StickyMenuContainer";
 
@@ -31,19 +29,6 @@ const EditStickyMenu: React.FC<StickyMenuProps> = ({ isVisible, id }) => {
     });
   };
 
-  const handleSizeUpdate = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    const sizes = Object.values(STICKY_SIZES);
-    const newSize =
-      thisNote.size === undefined
-        ? STICKY_SIZES.trivial
-        : thisNote.size === STICKY_SIZES.tooBig
-        ? undefined
-        : sizes[sizes.indexOf(thisNote.size) + 1];
-
-    updateNote({ id, size: newSize });
-  };
-
   return (
     <StickyMenuContainer isVisible={isVisible}>
       <Tooltip title="Delete Note" arrow placement="left">
@@ -60,8 +45,9 @@ const EditStickyMenu: React.FC<StickyMenuProps> = ({ isVisible, id }) => {
       </Tooltip>
       <Tooltip title="Change color" arrow placement="left">
         <div
-          className={`w-6 h-6 rounded-full ${thisNote.color.bgClass} hover:ring-2 ring-slate-400 cursor-pointer`}
+          className={`w-6 h-6 rounded-sm border border-slate-600 hover:ring-2 ring-slate-400 cursor-pointer`}
           onClick={handleColorChange}
+          style={{ backgroundColor: thisNote.color.rawColor }}
         />
       </Tooltip>
       <Tooltip title="Split" arrow placement="left">
@@ -92,34 +78,6 @@ const EditStickyMenu: React.FC<StickyMenuProps> = ({ isVisible, id }) => {
             <rect x="4" y="14" width="16" height="6" rx="2" />
             <path d="M12 10v4" />
           </svg>
-        </Button>
-      </Tooltip>
-      <Tooltip title="Change Size" arrow placement="left">
-        <Button
-          variant="outlined"
-          onClick={handleSizeUpdate}
-          size="small"
-          sx={{
-            width: "2rem !important",
-            minWidth: "2rem !important",
-            minHeight: "2rem !important",
-            height: "2rem !important",
-            padding: "0.5rem",
-            fontSize: 10,
-            fontWeight: "bold",
-            color: "white",
-            borderColor: "rgba(255, 255, 255, 0.23)",
-            "&:hover": {
-              borderColor: "rgba(255, 255, 255, 0.5)",
-              backgroundColor: "rgba(255, 255, 255, 0.1)"
-            }
-          }}
-        >
-          {thisNote.size
-            ? settings.showPoints
-              ? ITEM_SIZE_NUMERIC_MAP[thisNote.size]
-              : ITEM_SIZE_COPY_MAP[thisNote.size]
-            : "-"}
         </Button>
       </Tooltip>
     </StickyMenuContainer>

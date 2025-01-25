@@ -7,17 +7,17 @@ export interface StickyNoteColor {
 }
 
 export const STICKY_COLORS: StickyNoteColor[] = [
-  { name: "Blue", bgClass: "bg-blue-100", rawColor: "#dbeafe" },
-  { name: "Yellow", bgClass: "bg-yellow-100", rawColor: "#fef9c3" },
-  { name: "Green", bgClass: "bg-green-100", rawColor: "#dcfce7" },
-  { name: "Pink", bgClass: "bg-pink-100", rawColor: "#fce7f3" },
-  { name: "Purple", bgClass: "bg-purple-100", rawColor: "#f3e8ff" },
+  { name: "Blue", bgClass: "bg-blue-500", rawColor: "#3b82f6" },
+  { name: "Amber", bgClass: "bg-amber-500", rawColor: "#f59e0b" },
+  { name: "Emerald", bgClass: "bg-emerald-500", rawColor: "#10b981" },
+  { name: "Rose", bgClass: "bg-rose-400", rawColor: "#fb7185" },
+  { name: "Violet", bgClass: "bg-violet-500", rawColor: "#8b5cf6" },
 ];
 
 export const BAD_ENDING_COLOR: StickyNoteColor = {
   name: "red",
-  bgClass: "bg-red-200",
-  rawColor: "#ff0000",
+  bgClass: "bg-red-500",
+  rawColor: "#ef4444",
 };
 
 export const BAD_ENDING: Note[] = [

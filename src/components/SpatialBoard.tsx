@@ -154,8 +154,9 @@ const SpatialBoardV2: React.FC = () => {
                 }
                 x2={activeConnPosition.x / zoom}
                 y2={activeConnPosition.y / zoom}
-                stroke="black"
-                strokeWidth="2"
+                stroke="white"
+                strokeOpacity={0.6}
+                strokeWidth={6}
                 strokeDasharray="5,5"
               />
             )}
