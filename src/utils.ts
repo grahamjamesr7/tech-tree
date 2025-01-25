@@ -47,12 +47,12 @@ export const getConnectionPoint = (
 ): { x: number; y: number } => {
   switch (side) {
     case "top":
-      return { x: note.x, y: note.y - 96 };
+      return { x: note.x, y: note.y - 112 };  // h-56/2 = 224/2
     case "right":
-      return { x: note.x + 96, y: note.y };
+      return { x: note.x + 132, y: note.y };  // w-64/2 + 4 = 256/2 + 4 for border
     case "bottom":
-      return { x: note.x, y: note.y + 96 };
+      return { x: note.x, y: note.y + 112 };  // h-56/2 = 224/2
     case "left":
-      return { x: note.x - 96, y: note.y };
+      return { x: note.x - 132, y: note.y };  // w-64/2 + 4 = 256/2 + 4 for border
   }
 };

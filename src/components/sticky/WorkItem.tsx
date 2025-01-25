@@ -141,42 +141,22 @@ const WorkItem: React.FC<WorkItemProps> = ({ id, x, y }) => {
       }}
       onClick={(e) => e.stopPropagation()}
     >
-      <div
-        className={`connection-handle absolute top-0 left-1/2 w-3 h-3 cursor-pointer transform -translate-x-1/2 -translate-y-1/2 transition-all duration-200 
-        bg-white border-2 border-slate-600 hover:border-blue-400 
-        ${showConn ? "opacity-100 scale-100" : "opacity-0 scale-75"}`}
-        style={{
-          clipPath: "polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%)"
-        }}
-        onMouseDown={(e) => connectorClicked(e, "top")}
-      />
-      <div
-        className={`connection-handle absolute top-1/2 right-0 w-3 h-3 cursor-pointer transform translate-x-1/2 -translate-y-1/2 transition-all duration-200 
-        bg-white border-2 border-slate-600 hover:border-blue-400
-        ${showConn ? "opacity-100 scale-100" : "opacity-0 scale-75"}`}
-        style={{
-          clipPath: "polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%)"
-        }}
-        onMouseDown={(e) => connectorClicked(e, "right")}
-      />
-      <div
-        className={`connection-handle absolute top-1/2 left-0 w-3 h-3 cursor-pointer transform -translate-x-1/2 -translate-y-1/2 transition-all duration-200 
-        bg-white border-2 border-slate-600 hover:border-blue-400
-        ${showConn ? "opacity-100 scale-100" : "opacity-0 scale-75"}`}
-        style={{
-          clipPath: "polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%)"
-        }}
-        onMouseDown={(e) => connectorClicked(e, "left")}
-      />
-      <div
-        className={`connection-handle absolute bottom-0 left-1/2 w-3 h-3 cursor-pointer transform -translate-x-1/2 translate-y-1/2 transition-all duration-200 
-        bg-white border-2 border-slate-600 hover:border-blue-400
-        ${showConn ? "opacity-100 scale-100" : "opacity-0 scale-75"}`}
-        style={{
-          clipPath: "polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%)"
-        }}
-        onMouseDown={(e) => connectorClicked(e, "bottom")}
-      />
+      {["top", "right", "left", "bottom"].map((side) => (
+        <div
+          key={side}
+          className={`connection-handle absolute w-4 h-4 cursor-pointer transform transition-all duration-200 
+          bg-white border-2 border-slate-600 hover:border-blue-400
+          ${showConn ? "opacity-100 scale-100" : "opacity-0 scale-75"}
+          ${side === "top" ? "top-0 left-1/2 -translate-x-1/2 -translate-y-1/2" : ""}
+          ${side === "right" ? "top-1/2 right-0 translate-x-1/2 -translate-y-1/2" : ""}
+          ${side === "left" ? "top-1/2 left-0 -translate-x-1/2 -translate-y-1/2" : ""}
+          ${side === "bottom" ? "bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2" : ""}`}
+          style={{
+            clipPath: "polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%)"
+          }}
+          onMouseDown={(e) => connectorClicked(e, side as Side)}
+        />
+      ))}
 
       <div 
         className="h-1.5 w-full"

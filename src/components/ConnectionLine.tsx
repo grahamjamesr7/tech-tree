@@ -200,15 +200,15 @@ const ConnectionLine: React.FC<ConnectionLineProps> = ({ id }) => {
   return (
     <svg
       className="absolute top-0 left-0 w-full h-full"
-      style={{ overflow: "visible", pointerEvents: "none" }}
+      style={{ overflow: "visible", pointerEvents: "none", zIndex: 1000 }}
     >
       {/* Define the arrowhead marker */}
       <defs>
         <marker
           id={`arrowhead-${id}`}
-          markerWidth="6"
+          markerWidth="5"
           markerHeight="4"
-          refX="3"
+          refX={4}
           refY="2"
           orient={arrowRotation}
           markerUnits="strokeWidth"
@@ -238,16 +238,26 @@ const ConnectionLine: React.FC<ConnectionLineProps> = ({ id }) => {
       />
 
       {/* Visible path */}
-      <path
-        d={path}
-        stroke="white"
-        strokeOpacity={0.6}
-        strokeWidth={connection.style.type === "informs" ? 4 : 6}
-        strokeDasharray={connection.style.type === "informs" ? "5,5" : "none"}
-        fill="none"
-        pointerEvents="none"
-        markerEnd={`url(#arrowhead-${id})`}
-      />
+      <g>
+        <circle 
+          cx={start.x}
+          cy={start.y}
+          r={4}
+          fill="white"
+          fillOpacity={0.6}
+          pointerEvents="none"
+        />
+        <path
+          d={path}
+          stroke="white"
+          strokeOpacity={0.6}
+          strokeWidth={connection.style.type === "informs" ? 4 : 6}
+          strokeDasharray={connection.style.type === "informs" ? "5,5" : "none"}
+          fill="none"
+          pointerEvents="none"
+          markerEnd={`url(#arrowhead-${id})`}
+        />
+      </g>
 
       {/* Radial menu */}
       {selectedConnection == id && (
