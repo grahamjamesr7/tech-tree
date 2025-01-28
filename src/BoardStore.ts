@@ -152,7 +152,28 @@ interface BoardState {
 const savedState = localStorage.getItem("boardState");
 const savedSettings = localStorage.getItem("tech-tree-settings");
 
-const initState: BoardState = savedState ? JSON.parse(savedState) : undefined;
+function getSavedState():
+  | { notes: Note[]; connections: Connection[] }
+  | undefined {
+  console.debug("loading");
+  const savedState = localStorage.getItem("boardState");
+  if (!savedState) return undefined;
+
+  const { notes, connections } = JSON.parse(savedState);
+  for (const note of notes) {
+    if (note.color === undefined) {
+      note.color = STICKY_COLORS[0];
+    }
+    if (note.status === undefined) {
+      note.status = STICKY_STATUSES.notStarted;
+      console.debug("patching status", note.id, note.status);
+    }
+  }
+  return { notes, connections };
+}
+
+// @ts-ignore
+const initState: BoardState | undefined = getSavedState();
 
 const initSettings: BoardSettings = savedSettings
   ? JSON.parse(savedSettings)
@@ -402,14 +423,11 @@ const useBoardStore = create<BoardState>((set, get) => ({
   },
   loadBoard: () => {
     try {
-      const savedState = localStorage.getItem("boardState");
-      if (savedState) {
-        const { notes, connections } = JSON.parse(savedState);
-        set({
-          notes: notes || [],
-          connections: connections || [],
-        });
-      }
+      const savedState = getSavedState();
+      set({
+        notes: savedState ? savedState.notes : [],
+        connections: savedState ? savedState.connections : [],
+      });
     } catch (err) {
       console.error("Failed to load board state:", err);
     }
