@@ -155,7 +155,6 @@ const savedSettings = localStorage.getItem("tech-tree-settings");
 function getSavedState():
   | { notes: Note[]; connections: Connection[] }
   | undefined {
-  console.debug("loading");
   const savedState = localStorage.getItem("boardState");
   if (!savedState) return undefined;
 
@@ -166,7 +165,6 @@ function getSavedState():
     }
     if (note.status === undefined) {
       note.status = STICKY_STATUSES.notStarted;
-      console.debug("patching status", note.id, note.status);
     }
   }
   return { notes, connections };
